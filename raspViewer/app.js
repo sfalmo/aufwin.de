@@ -200,8 +200,8 @@ function onMapClick() {
     updateOverlay();
 }
 
+// currently not used
 function onMapRightClick(e) {
-    console.log("Right click at " + e.latlng);
     var latLng = L.latLng(e.latlng);
     var {model, day} = getModelAndDay();
     var parameter = gParameterSelect.value;
@@ -213,7 +213,6 @@ function onMapRightClick(e) {
     }
 
     var content = "<p><img src='app.php?region="+model+"&period="+day+"&lat="+latLng.lat+"&lon="+latLng.lng+"&time="+time+"&output=img&type="+finalParameter+"'>";
-    console.log("Popup URL="+content);
 
     var popup = L.popup({minWidth: 200})
         .setLatLng(latLng)
@@ -226,6 +225,7 @@ function onMapRightClick(e) {
 function addModelDays() {
     const dayNames   = [dict["Sunday"], dict["Monday"], dict["Tuesday"], dict["Wednesday"], dict["Thursday"], dict["Friday"], dict["Saturday"]];
     const monthNames = ["Jan", "Feb", dict["Mar"], "Apr", dict["May"], "Jun", "Jul", "Aug", "Sep", dict["Oct"], "Nov", dict["Dec"]];
+    const dayRelative = [dict["Today"], dict["Tomorrow"]];
 
     var Now = new Date().getTime();        // current time in ms
     var millisInDay = 24 * 60 * 60 * 1000; // ms in a day
@@ -237,13 +237,13 @@ function addModelDays() {
     for (const modelKey of Object.keys(cModels)) {
         var model = cModels[modelKey];
         for (const day of model.days) { // Add all days
-            T.setTime(Now + (millisInDay * day));
-            var modelDescription = dayNames[T.getDay()] + ' ' + T.getDate() + ' ' + monthNames[T.getMonth()] + " - " + model.description;
+            // T.setTime(Now + (millisInDay * day));
+            // var modelDescription = dayNames[T.getDay()] + ' ' + T.getDate() + ' ' + monthNames[T.getMonth()];
+            var modelDescription = dayRelative[day];
             var modelDir = modelKey;
             if (day != 0) {
                 modelDir += "+" + day;
             }
-            console.log("Adding model " + modelDescription + "(" + modelDir + ")");
             gModelDaySelect.add(new Option(modelDescription, modelDir));
         }
     }

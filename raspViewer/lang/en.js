@@ -23,6 +23,8 @@ var dict = {
     "from": "from",
     "GFSA-initiated": "GFSA-initiated",
     "WRF-ARW model": "WRF-ARW model",
+    "Today": "Today",
+    "Tomorrow": "Tomorrow",
     "Monday": "Monday",
     "Tuesday": "Tuesday",
     "Wednesday": "Wednesday",
