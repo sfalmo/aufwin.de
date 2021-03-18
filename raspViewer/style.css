@@ -15,6 +15,8 @@ body {
     margin-top: 2px;
     margin-left: 1ch;
 }
+
+/* Info modal (currently not used) */
 #infoModalBase {
     display: none;
     position: fixed;
@@ -66,6 +68,8 @@ body {
     flex: 1 1 auto;
     overflow-y: auto;
 }
+
+/* Loading animation */
 #loadingDiv {
     position: absolute;
     left: 50%;
@@ -86,13 +90,18 @@ body {
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
+
 #top {
     flex: 0 1 auto;
-    max-height: 400px;
     text-align: center;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+}
+@media (max-width: 80em) {
+    #top {
+        font-size: smaller;
+    }
 }
 #titleDiv {
     flex: 1 1 auto;
@@ -120,6 +129,14 @@ body {
     flex: 1 1 auto;
     height: 100%;
     width: 100%;
+}
+.imagePopup {
+    width: 550px;
+}
+@media (max-width: 800px) {
+    .imagePopup {
+        width: 80vw;
+    }
 }
 #sideScaleImg {
     flex: 1 1 auto;

@@ -334,7 +334,7 @@ function updateOverlay() {
 // --- Soundings and meteograms ---
 
 function getSoundingMarkers(modelKey) {
-    var frontURL = "<img style='width:"+cDefaultPopupSize+"px; height:"+cDefaultPopupSize+"px;' src='"+cForecastServerRoot;
+    var frontURL = "<img class='imagePopup' src='"+cForecastServerRoot;
     var backURL = "lst.d2.png'></div>";
     var markers = [];
     var soundings = cSoundings[modelKey];
@@ -343,7 +343,7 @@ function getSoundingMarkers(modelKey) {
         markers.push(
             L.marker(sounding.location, {icon: gSoundingIcon})
                 .bindTooltip(sounding.name)
-                .bindPopup(L.popup({maxWidth: cDefaultPopupSize}))
+                .bindPopup(L.popup({maxWidth: "auto"}))
                 .on('popupopen', function(e) {
                     var modelDir = gModelDaySelect.value;
                     var time = gTimeSelect.value;
@@ -357,7 +357,7 @@ function getSoundingMarkers(modelKey) {
 }
 
 function getMeteogramMarkers(modelKey) {
-    var frontURL = "<img style='width:"+cDefaultPopupSize+"px; height:"+cDefaultPopupSize+"px;' src='"+cForecastServerRoot;
+    var frontURL = "<img class='imagePopup' src='"+cForecastServerRoot;
     var backURL = ".png'></div>";
     var markers = [];
     var meteograms = cMeteograms[modelKey];
@@ -366,7 +366,7 @@ function getMeteogramMarkers(modelKey) {
         markers.push(
             L.marker(location, {icon: gMeteogramIcon})
                 .bindTooltip(meteogramKey)
-                .bindPopup(L.popup({maxWidth: cDefaultPopupSize}))
+                .bindPopup(L.popup({maxWidth: "auto"}))
                 .on('popupopen', function(e) {
                     var modelDir = gModelDaySelect.value;
                     var popup = e.target.getPopup();
