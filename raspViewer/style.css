@@ -1,0 +1,150 @@
+html, body {
+    font-family: Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: auto;
+    overflow: hidden;
+}
+body {
+    display: flex;
+    flex-direction: column;
+}
+#nav > a {
+    float: right;
+    margin-top: 2px;
+    margin-left: 1ch;
+}
+#infoModalBase {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+#infoModal {
+    background-color: #fefefe;
+    margin-top: 10vh;
+    margin-left: auto;
+    margin-right: auto;
+    max-height: 80vh;
+    border: 1px solid #888;
+    width: 80%;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+}
+#infoModal > div {
+    padding: 10px;
+}
+#infoHeader {
+    background-color: #f0f0f0;
+    flex: 0 1 auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+#infoHeaderContent {
+    flex: 1 1 auto;
+}
+#infoClose {
+    flex: 0 1 auto;
+    color: #aaaaaa;
+    font-size: 28px;
+    font-weight: bold;
+}
+#infoClose:hover,
+#infoClose:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+#infoBodyContent {
+    flex: 1 1 auto;
+    overflow-y: auto;
+}
+#loadingDiv {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 999;
+    pointer-events: none;
+}
+#loadingAnimation {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+#top {
+    flex: 0 1 auto;
+    max-height: 400px;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+#titleDiv {
+    flex: 1 1 auto;
+}
+#titleDiv > * {
+    margin: 0;
+}
+/* #titleImg { */
+/*     height: 100%; */
+/* } */
+#logoDiv {
+    flex: 0 0 auto;
+}
+#logo {
+    margin: 2px;
+    height: 50px;
+}
+#mapAndScale {
+    flex: 1 1 auto;
+    min-height: 0; /* This is important! Lets the scale shrink to remaining height */
+    display: flex;
+    flex-direction: row;
+}
+#map {
+    flex: 1 1 auto;
+    height: 100%;
+    width: 100%;
+}
+#sideScaleImg {
+    flex: 1 1 auto;
+    width: auto;
+    height: 100%;
+    padding: 5px;
+}
+#bottomScaleImg {
+    display: none; /* TODO: decide whether to show side or bottom scale based on screen width/height */
+    padding: 5px;
+}
+#modelDayTimeParameterDiv > div, .RASPControlDiv > button {
+    margin-top: 4px;
+    margin-right: 5px;
+}
+#parameterDiv > details {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 5px;
+    padding-right: 5px;
+    background-color: white;
+    opacity: 0.9;
+    cursor: default;
+}
+#parameterDiv > details[open] {
+    margin-right: 5px;
+    max-width: 80ch;
+}

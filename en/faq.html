@@ -1,0 +1,32 @@
+<h3>What is RASP?</h3>
+<p>
+    The forecasts you see here are obtained using <a href="http://www.drjack.info" target="_blank">Dr. John W. "DrJack" Glendening's</a> <a href="http://www.drjack.info/RASP/index.html" target="_blank">Regional Atmospheric Soaring Prediction (RASP)</a>. RASP is a weather simulation program based on the <a href="https://www.mmm.ucar.edu/weather-research-and-forecasting-model" target="_blank">Weather Research and Forecasting Model (WRF)</a> that computes and outputs parameters specifically tailored to glider pilots' needs. RASP has been developed in the early 2000s and has evolved to a community project with many people using DrJack's program to produce weather forecasts for their gliding locations.
+</p>
+
+<h3>How does a RASP forecast work?</h3>
+<p>
+    In RASP, the forecast of a day is not obtained by mere post-processing of third-party model data. Instead, it is based on an independent numerical simulation run that computes an equations of motion model describing the physics of the atmosphere.<br>
+    Before starting the actual simulation run, data of the current meteorological conditions is fetched from the <a href="https://www.ncdc.noaa.gov/data-access/model-data/model-datasets/global-forcast-system-gfs" target="_blank">Global Forecast System (GFS)</a>. This data is used to initialize both a high-resolution model grid covering the region of interest as well as a surrounding lower-resolution domain. Then, the simulation run is started and the time evolution of the meteorological parameters on every grid point of the inner and outer domain is calculated. For this, RASP uses the actual underlying physical equations that govern the behavior of those parameters.<br>
+    While the simulation advances, the borders of the large domain are fed with GFS model data. In turn, the inner high-resolution domain gets its boundary conditions from the surrounding larger domain. Due to this coupling procedure, high-accuracy results are achieved for the fine-grained inner domain while avoiding the propagation of inaccuracies from coarse initialization and boundary data.<br>
+    In regular intervals, RASP calculates and outputs parameters of the simulation. Those are plotted after the run has finished and shown as overlays on the map. Additionally, model soundings (SkewT/logP diagrams) and meteograms are plotted for certain grid points which provide information about the vertical composition of the atmosphere and the weather evolution during the day at the respective location.
+</p>
+
+<h3>How accurate are the results?</h3>
+<p>
+    Compared to most common weather models, the grid on which the physical equations are solved has a much higher resolution and highly accurate <a href="https://www2.jpl.nasa.gov/srtm/" target="_blank">Shuttle Radar Topography Mission (SRTM)</a> data is used for modeling the topography of the domain.<br>
+    This has certain effects on the simulation results:
+    <ul>
+        <li>The numerical error is decreased.</li>
+        <li>Meteorological phenomena which cannot be simulated explicitly on a coarse grid can be resolved.</li>
+        <li>Influences of small topographical features (cities, hills/valleys, lakes, etc.) come into play.</li>
+    </ul>
+    Especially the latter points suggest certain advantages for glider pilots, e.g. that thermal spots, ridge lift, convergence lines, lee waves, etc. are directly accessible in the model output.<br>
+    However, as with any numerical simulation, accuracy is also limited by the initial and boundary data. If the real meteorological conditions deviate significantly from the ones provided by the GFS model, forecasts may be inaccurate.<br>
+    <strong>Tip</strong>: Some predicted parameters (such as the surface temperature, dew point or cloudiness) can easily be compared to actual conditions and are therefore suited as a benchmark of the accuracy of the forecast. If those are off, also expect uncertainty in other parameters.
+</p>
+
+<h3>Are there RASP forecasts for other regions?</h3>
+<p>
+    There are other sites that produce RASP forecasts, e.g. <a href="https://blipmaps.nl" target="_blank">blipmaps.nl</a> for BeNeLux and north-west Germany, <a href="http://46.243.114.203/drjack/nord_de.html" target="_blank">this site</a> for northern Germany and <a href="https://www.fcst.pl" target="_blank">fcst.pl</a> for Poland to name some that are located in central Europe. Of course there are many more around the globe.<br>
+    However, running weather simulations is number crunching and needs significant computing capacities. This does not come for free and limits the size and resolution of domains (the larger/finer a domain the more computing power necessary). If you would like to have a larger region covered, new regions added, more forecast days or more frequent simulation runs, consider supporting this project and get in touch (email: info at this domain).
+</p>

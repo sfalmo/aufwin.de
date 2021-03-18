@@ -1,0 +1,101 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="author" content="Florian Sammüller">
+        <meta name="description" content="Detailliertes Segelflugwetter für Bayern, Thüringen, Sachsen und West-Tschechien mit RASP BLIPMAPS.">
+        <meta name="keywords" content="RASP, BLIPMAPS, Segelflugwetter, Segelflugwetterbericht, Segelfliegen, Wettervorhersage, Thermik, Streckenflug, soaring, gliding, weather, forecast">
+        <title>aufwin.de - RASP for Germany</title>
+        <link rel="shortcut icon" type="image/x-icon" href="/favicon.svg">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    </head>
+    <body>
+        <div role="main" class="container">
+
+            <hr>
+
+            <div class="text-center">
+                <img src="/logo.svg">
+                <h5>Segelflugwettervorhersage mit RASP</h5>
+                <h3>🠖 <a href="/raspViewer/">zum RASP-Viewer</a> 🠔</h3>
+            </div>
+
+            <hr>
+
+            <div>
+                <h2>News</h2>
+                <h4>Go-live von aufwin.de</h4>
+                <h6>18.03.2021</h6>
+                <p>
+                    <div class="text-center mb-2">
+                        <img src="/img/domain_sketch.png" class="rounded" style="max-height: 300px;" alt="Karte mit 400km x 400km großem Vorhersagebereich">
+                    </div>
+                    Seit Mitte März 2021 produziert aufwin.de täglich detaillierte Segelflugwettervorhersagen für den aktuellen sowie den darauffolgenden Tag. Im Moment wird eine 400km x 400km große Region mit Zentrum 50°N 12°W abgedeckt, was u.a. Sachsen, Thüringen, einen Großteil Bayerns, Teile der jeweils angrenzenden Bundesländer sowie West-Tschechien einschließt (siehe Bild, innerer Bereich). Insbesondere beinhaltet der Bereich das Erzgebirge, den Thüringer, Oberpfälzer und Bayerischen Wald sowie Fränkische und Schwäbische Alb, das Thüringer Becken und die Rhön, wodurch diese Seite Wettervorhersagen für viele beliebte Segelflugregionen Deutschlands bietet.<br>
+                    Die Vorhersagen basieren auf Simulationen (siehe FAQ), welche täglich gemäß folgendem Zeitplan laufen:
+                    <table class="table table-bordered mt-2">
+                        <thead>
+                            <tr>
+                                <th>Vorhersagetag</th>
+                                <th>Start</th>
+                                <th>Resultate verfügbar ab ca.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Aktueller Tag</td>
+                                <td>0400Z</td>
+                                <td>0530Z</td>
+                            </tr>
+                            <tr>
+                                <td>Folgetag</td>
+                                <td>0600Z</td>
+                                <td>0730Z</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    Die Vorhersagekarten sowie Vertikalprofile und Meteogramme können im <a href="/raspViewer">RASP-Viewer</a> betrachtet werden. Zu jedem Parameter gibt es hilfreiche Erklärungen, welche die Interpretation der Resultate vereinfachen.
+                </p>
+            </div>
+
+            <hr>
+
+            <div>
+                <h2>FAQ</h2>
+                <h4>Was ist RASP?</h4>
+                <p>
+                    Die hier gezeigten Wettervorhersagen werden mit <a href="http://www.drjack.info" target="_blank">Dr. John W. "DrJack" Glendening's</a> <a href="http://www.drjack.info/RASP/index.html" target="_blank">Regional Atmospheric Soaring Prediction (RASP)</a> erstellt. RASP ist ein Wettersimulations-Tool, welches auf dem <a href="https://www.mmm.ucar.edu/weather-research-and-forecasting-model" target="_blank">Weather Research and Forecasting Model (WRF)</a> basiert und meteorologische Parameter berechnet und darstellt, die von besonderem Interesse für den Segelflug sind. RASP wurde Anfang der 2000er-Jahre entwickelt und wird seitdem in vielen Regionen zur Segelflugwettervorhersage genutzt.
+                </p>
+                <h4>Wie funktioniert die Segelflugwettervorhersage mit RASP?</h4>
+                <p>
+                    Mit RASP wird das Wettergeschehen für einen Vorhersagetag nicht etwa nur anhand bereits verfügbarer Modelldaten ausgewertet. Stattdessen wird selbst eine explizite numerische Simulation der physikalischen Bewegungsgleichungen der Atmosphäre durchgeführt.<br>
+                    Vor dem Start der eigentlichen Simulation werden die aktuellen Wetterdaten vom <a href="https://www.ncdc.noaa.gov/data-access/model-data/model-datasets/global-forcast-system-gfs" target="_blank">Global Forecast System (GFS)</a> bezogen. Mit diesen Daten wird dann ein hochauflösendes Modellgitter auf der zu betrachtenden Region sowie ein gröberes Gitter auf einem größeren umliegenden Bereich initialisiert und die Simulation gestartet. In dieser wird die Zeitentwicklung einer Vielzahl von meteorologischen Parametern auf jedem Gitterpunkt des inneren und äußeren Bereiches berechnet, wofür in RASP die grundlegenden physikalischen Modelle und Gleichungen, die die Dynamik dieser Parameter beschreiben, genutzt werden.<br>
+                    Im Laufe der Simulation wird der Rand der äußeren Domäne mit Daten des GFS-Wettermodells gespeist. Die Randbedingungen des inneren Gitters werden wiederum durch das umliegende äußere bestimmt. Durch diese Kopplung ist eine präzise Simulation der hochauflösenden inneren Region möglich, ohne dass sich dabei die Ungenauigkeiten der grob aufgelösten Anfangs- und Randdaten direkt fortpflanzen.<br>
+                    In regelmäßigen Zeitabständen werden verschiedene meteorologische Parameter berechnet und ausgegeben. Diese werden nach der Simulation geplottet und auf der Karte dargestellt. Zusätzlich werden für einige Gitterpunkte Vertikalprofile (Temps) und Meteogramme erstellt, die zusätzliche Informationen über den Zustand der unteren Atmosphäre im Tagesverlauf an den jeweiligen Orten geben.
+                </p>
+                <h4>Wie genau sind die Resultate?</h4>
+                <p>
+                    Verglichen mit den meisten anderen bekannten Wettermodellen ist das Gitter, auf dem die physikalischen Bewegungsgleichungen gelöst werden, wesentlich hochauflösender. Außerdem werden zur Modellierung des Geländes Daten der <a href="https://www2.jpl.nasa.gov/srtm/" target="_blank">Shuttle Radar Topography Mission (SRTM)</a> genutzt. Durch diese Maßnahmen:
+                    <ul>
+                        <li>werden die numerischen Fehler der Simulation kleiner.</li>
+                        <li>können manche meteorologischen Phänomene explizit berechnet werden, die in Simulationen mit gröberen Gittern nicht zugänglich sind.</li>
+                        <li>wird der Einfluss kleinskaliger topographischer Gegebenheiten (kleine Städte, Berge/Täler, Seen, etc.) sichtbar.</li>
+                    </ul>
+                    Besonders die letzten Punkte verdeutlichen den Nutzen für den Segelflug, da thermische Hotspots, Hangwinde, Konvergenzlinien, Leewellen, etc. direkt in den Simulationsdaten auftauchen.<br>
+                    Trotz allem ist die Genauigkeit natürlich auch durch die gegebenen Anfangs- und Randbedingungen limitiert. Wenn das beobachtete Wetter stark vom GFS-Modell abweicht, könnten die Vorhersagen ungenau sein.<br>
+                    <strong>Tipp:</strong> Manche vorhergesagten Parameter (z.B. Oberflächentemperatur, Taupunkt oder Bewölkung) können einfach mit den aktuellen Gegebenheiten verglichen werden und dienen damit als Genauigkeitskriterium der Vorhersage. Bei starken Abweichungen in diesen Parametern sind auch Fehler in den anderen zu erwarten.
+                </p>
+                <h4>Gibt es RASP-Vorhersagen auch für andere Regionen?</h4>
+                <p>
+                    Ja, z.B. <a href="https://blipmaps.nl" target="_blank">blipmaps.nl</a> für BeNeLux und Nordwestdeutschland, <a href="http://46.243.114.203/drjack/nord_de.html" target="_blank">diese Seite</a> für Norddeutschland, <a href="https://www.fcst.pl" target="_blank">fcst.pl</a> für Polen und noch viele weitere außerhalb Mitteleuropas.<br>
+                    Die Durchführung eines RASP-Simulationslaufes erfordert jedoch einiges an Rechenleistung. Diese gibt es nicht umsonst, was die Auflösung und Größe von Regionen limitiert. Falls Interesse an größeren oder zusätzlichen Regionen, mehr Vorhersagetagen oder häufigeren Simulationsläufen pro Tag besteht, freuen wir uns über Unterstützung (E-Mail: info at diese Domain).
+                </p>
+            </div>
+
+            <hr>
+
+            <div class="text-center">
+                <p>© 2021 Florian Sammüller | <a href="/impressum.html">Impressum</a> | <a href="/datenschutz.html">Datenschutz</a></p>
+            </div>
+        </div>
+    </body>
+</html>
