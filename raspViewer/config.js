@@ -166,7 +166,7 @@ const cDefaultParameterTime = "1300";          // which hour to start on
 const cZoomLocation = 'bottomleft';            // Zoom control position
 const cScaleLocation = 'bottomleft';           // Scale position
 const cRASPControlLocation = 'topleft';        // Position of custom RASP data control
-const cDefaultPopupSize = "530";               // image popup size
+const cDefaultPopupSize = "300";               // should be set by CSS instead
 
 const cSoundingMarker = 'img/sounding.svg';
 const cMeteogramMarker = 'img/meteogram.svg';

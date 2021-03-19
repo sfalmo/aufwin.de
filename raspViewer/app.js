@@ -334,8 +334,6 @@ function updateOverlay() {
 // --- Soundings and meteograms ---
 
 function getSoundingMarkers(modelKey) {
-    var frontURL = "<img class='imagePopup' src='"+cForecastServerRoot;
-    var backURL = "lst.d2.png'></div>";
     var markers = [];
     var soundings = cSoundings[modelKey];
     for (const soundingKey of Object.keys(soundings)) {
@@ -343,13 +341,15 @@ function getSoundingMarkers(modelKey) {
         markers.push(
             L.marker(sounding.location, {icon: gSoundingIcon})
                 .bindTooltip(sounding.name)
-                .bindPopup(L.popup({maxWidth: "auto"}))
-                .on('popupopen', function(e) {
+                .on('click', function(e) {
                     var modelDir = gModelDaySelect.value;
                     var time = gTimeSelect.value;
-                    var popup = e.target.getPopup();
-                    var totalURL = frontURL + "/" + modelDir + "/sounding" + soundingKey + ".curr." + time + backURL;
-                    popup.setContent(totalURL);
+                    var popupImage = new Image();
+                    popupImage.setAttribute("class", "imagePopup");
+                    popupImage.onload = () => {
+                        L.popup({maxWidth: "auto"}).setLatLng(e.target.getLatLng()).setContent(popupImage).openOn(gMap);
+                    };
+                    popupImage.src = cForecastServerRoot + "/" + modelDir + "/sounding" + soundingKey + ".curr." + time + "lst.d2.png";
                 })
         );
     }
@@ -357,8 +357,6 @@ function getSoundingMarkers(modelKey) {
 }
 
 function getMeteogramMarkers(modelKey) {
-    var frontURL = "<img class='imagePopup' src='"+cForecastServerRoot;
-    var backURL = ".png'></div>";
     var markers = [];
     var meteograms = cMeteograms[modelKey];
     for (const meteogramKey of Object.keys(meteograms)) {
@@ -366,12 +364,14 @@ function getMeteogramMarkers(modelKey) {
         markers.push(
             L.marker(location, {icon: gMeteogramIcon})
                 .bindTooltip(meteogramKey)
-                .bindPopup(L.popup({maxWidth: "auto"}))
-                .on('popupopen', function(e) {
+                .on('click', function(e) {
                     var modelDir = gModelDaySelect.value;
-                    var popup = e.target.getPopup();
-                    var totalURL = frontURL + "/" + modelDir + "/meteogram_" + meteogramKey + backURL;
-                    popup.setContent(totalURL);
+                    var popupImage = new Image();
+                    popupImage.setAttribute("class", "imagePopup");
+                    popupImage.onload = () => {
+                        L.popup({maxWidth: "auto"}).setLatLng(e.target.getLatLng()).setContent(popupImage).openOn(gMap);
+                    };
+                    popupImage.src = cForecastServerRoot + "/" + modelDir + "/meteogram_" + meteogramKey + ".png";
                 })
         );
     }
