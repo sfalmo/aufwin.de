@@ -117,7 +117,13 @@ const cMultiParameters = {
 const cSoundings = {
     "TIR": {
         // keys: "1" -> sounding1, "2" -> sounding2, ...
-        "1": { "name": "Tirschenreuth", "location": ["49.8741", "12.3272"] }
+        "1": { "name": "Tirschenreuth",     "location": ["49.8741", "12.3272"] },
+        "2": { "name": "Oberhinkofen",      "location": ["48.9523", "12.1462"] },
+        "3": { "name": "Bamberg",           "location": ["49.9179", "10.9121"] },
+        "4": { "name": "Jena",              "location": ["50.9164", "11.7171"] },
+        "5": { "name": "Nördlingen",        "location": ["48.8703", "10.5034"] },
+        "6": { "name": "Großrückerswalde",  "location": ["50.6431", "13.1274"] },
+        "7": { "name": "Klatovy",           "location": ["49.4172", "13.3215"] }
     }
 };
 
@@ -166,7 +172,6 @@ const cDefaultParameterTime = "1300";          // which hour to start on
 const cZoomLocation = 'bottomleft';            // Zoom control position
 const cScaleLocation = 'bottomleft';           // Scale position
 const cRASPControlLocation = 'topleft';        // Position of custom RASP data control
-const cDefaultPopupSize = "300";               // should be set by CSS instead
 
 const cSoundingMarker = 'img/sounding.svg';
 const cMeteogramMarker = 'img/meteogram.svg';
