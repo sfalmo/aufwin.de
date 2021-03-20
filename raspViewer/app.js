@@ -54,8 +54,8 @@ L.Control.RASPControl = L.Control.extend({
 </div>
 <button onclick='parameterListToggle()' id='parameterButton' title='${dict["parameterButton_title"]}' value='short'>${dict["parameterButton_SwitchToFull"]}</button>
 <br>
-<button onclick='opacityDn()' title='${dict["opacityDecreaseButton_title"]}'><img src='img/opacity_minus.svg'></button>
-<button onclick='opacityUp()' title='${dict["opacityIncreaseButton_title"]}'><img src='img/opacity_plus.svg'></button>
+<button onclick='opacityDn()' title='${dict["opacityDecreaseButton_title"]}'><img class='icon' src='img/opacity_minus.svg'></button>
+<button onclick='opacityUp()' title='${dict["opacityIncreaseButton_title"]}'><img class='icon' src='img/opacity_plus.svg'></button>
 `;
         return div;
     },
@@ -113,6 +113,8 @@ gImageOverlayPreload.onerror = () => {
     gImageOverlay.setUrl(cImageOverlayErrorImage);
     gImageOverlayLoadingAnimation.style.visibility = "hidden";
 };
+
+var gPopupPane = document.getElementsByClassName("leaflet-popup-pane")[0];
 
 gMap.on('click', onMapClick); // left single click
 gMap.on('contextmenu', onMapRightClick); // right single click
@@ -196,8 +198,10 @@ function opacityDn() {
 // --- Map click handlers ---
 
 function onMapClick() {
-    gTimeSelect.selectedIndex = getCyclicNextTimeIndex();
-    updateOverlay();
+    if (gPopupPane.innerHTML.trim().length == 0) {
+        gTimeSelect.selectedIndex = getCyclicNextTimeIndex();
+        updateOverlay();
+    }
 }
 
 // currently not used
@@ -333,6 +337,17 @@ function updateOverlay() {
 
 // --- Soundings and meteograms ---
 
+function makePopup(e, imageUrl, popupImage) {
+    var popupContent = document.createElement('div');
+    var popupLink = document.createElement("A");
+    popupLink.innerHTML = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 48 48'><path d='M38 38H10V10h14V6H10c-2.21 0-4 1.79-4 4v28c0 2.21 1.79 4 4 4h28c2.21 0 4-1.79 4-4V24h-4v14zM28 6v4h7.17L15.51 29.66l2.83 2.83L38 12.83V20h4V6H28z'/></svg>";
+    popupLink.href = imageUrl;
+    popupLink.target = "_blank";
+    popupContent.appendChild(popupLink);
+    popupContent.appendChild(popupImage);
+    L.popup({maxWidth: "auto"}).setLatLng(e.target.getLatLng()).setContent(popupContent).openOn(gMap);
+}
+
 function getSoundingMarkers(modelKey) {
     var markers = [];
     var soundings = cSoundings[modelKey];
@@ -344,12 +359,13 @@ function getSoundingMarkers(modelKey) {
                 .on('click', function(e) {
                     var modelDir = gModelDaySelect.value;
                     var time = gTimeSelect.value;
+                    var imageUrl = cForecastServerRoot + "/" + modelDir + "/sounding" + soundingKey + ".curr." + time + "lst.d2.png";
                     var popupImage = new Image();
                     popupImage.setAttribute("class", "imagePopup");
                     popupImage.onload = () => {
-                        L.popup({maxWidth: "auto"}).setLatLng(e.target.getLatLng()).setContent(popupImage).openOn(gMap);
+                        makePopup(e, imageUrl, popupImage);
                     };
-                    popupImage.src = cForecastServerRoot + "/" + modelDir + "/sounding" + soundingKey + ".curr." + time + "lst.d2.png";
+                    popupImage.src = imageUrl;
                 })
         );
     }
@@ -366,12 +382,13 @@ function getMeteogramMarkers(modelKey) {
                 .bindTooltip(meteogramKey)
                 .on('click', function(e) {
                     var modelDir = gModelDaySelect.value;
+                    var imageUrl = cForecastServerRoot + "/" + modelDir + "/meteogram_" + meteogramKey + ".png";
                     var popupImage = new Image();
                     popupImage.setAttribute("class", "imagePopup");
                     popupImage.onload = () => {
-                        L.popup({maxWidth: "auto"}).setLatLng(e.target.getLatLng()).setContent(popupImage).openOn(gMap);
+                        makePopup(e, imageUrl, popupImage);
                     };
-                    popupImage.src = cForecastServerRoot + "/" + modelDir + "/meteogram_" + meteogramKey + ".png";
+                    popupImage.src = imageUrl;
                 })
         );
     }
