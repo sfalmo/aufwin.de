@@ -33,12 +33,31 @@ var gMap = L.map('map', {
 L.control.scale({position: cScaleLocation}).addTo(gMap);
 L.control.zoom({position: cZoomLocation}).addTo(gMap);
 
-// Add custom RASP controls
 L.Control.RASPControl = L.Control.extend({
     onAdd: function(map) {
-        var div = L.DomUtil.create('div', 'RASPControlDiv');
-        L.DomEvent.addListener(div, 'click', L.DomEvent.stopPropagation);
-        div.innerHTML = `
+        var className = "leaflet-control-layers";
+        this._map = map;
+        this._container = L.DomUtil.create('div', className);
+        L.DomUtil.addClass(this._container, 'rasp-control');
+        if (!L.Browser.android) {
+            L.DomEvent.on(this._container, {
+                mouseenter: this.expand,
+            }, this);
+        }
+        this._link = L.DomUtil.create('a', className + '-toggle', this._container);
+		    this._link.href = '#';
+        this._link.title = 'RASP Control';
+        if (L.Browser.touch) {
+            L.DomEvent.on(this._link, 'click', L.DomEvent.stop);
+            L.DomEvent.on(this._link, 'click', this.expand, this);
+        } else {
+            L.DomEvent.on(this._link, 'focus', this.expand, this);
+        }
+        this.expand();
+        L.DomEvent.disableClickPropagation(this._container);
+        L.DomEvent.disableScrollPropagation(this._container);
+        this._rasp = L.DomUtil.create('div', "leaflet-control-layers-list", this._container);
+        this._rasp.innerHTML = `
 <div id='modelDayTimeParameterDiv'>
     <div id='modelDayTimeDiv'>
         <select onchange='modelDayChange()' id='modelDaySelect' title='${dict["modelDaySelect_title"]}' size='1'></select>
@@ -57,18 +76,30 @@ L.Control.RASPControl = L.Control.extend({
 <button onclick='opacityDn()' title='${dict["opacityDecreaseButton_title"]}'><img class='icon' src='img/opacity_minus.svg'></button>
 <button onclick='opacityUp()' title='${dict["opacityIncreaseButton_title"]}'><img class='icon' src='img/opacity_plus.svg'></button>
 `;
-        return div;
+        this._collapseLink = L.DomUtil.create('a', 'leaflet-control-collapse-button', this._rasp);
+        this._collapseLink.innerHTML = '×';
+        this._collapseLink.href = '#collapse';
+        L.DomEvent.on(this._collapseLink, 'click', this.collapse, this);
+        return this._container;
     },
     onRemove: function(map) {
         // Nothing to do here
-    }
+    },
+    expand: function () {
+        L.DomUtil.addClass(this._container, 'leaflet-control-layers-expanded');
+        return this;
+    },
+    collapse: function () {
+        L.DomUtil.removeClass(this._container, 'leaflet-control-layers-expanded');
+        return this;
+    },
 });
 
 L.control.raspControl = function(options) {
     return new L.Control.RASPControl(options);
 };
 
-L.control.raspControl({position: cRASPControlLocation}).addTo(gMap);
+var gRaspControl = L.control.raspControl({position: cRASPControlLocation}).addTo(gMap);
 
 // Selectors
 var gModelDaySelect = document.getElementById("modelDaySelect");
@@ -118,8 +149,6 @@ var gPopupPane = document.getElementsByClassName("leaflet-popup-pane")[0];
 
 gMap.on('click', onMapClick); // left single click
 gMap.on('contextmenu', onMapRightClick); // right single click
-
-gMapControl.expand(); // expand the layer control at first load to make the user aware of all options
 
 addModelDays(); // Initialize all models and days
 

@@ -53,7 +53,7 @@ var dict = {
     "bltopvariab.longname": "Unsicherheit der Grenzschichthöhe",
     "bltopvariab.description": "Unsicherheit der Grenzschichthöhe, abgeschätzt durch die hypothetische Erhöhung der vorhergesagten Oberflächentemperatur um 4°F (= 2,2°C). Höhere Werte können auf Bildungspotential lokaler Thermikhotspots hindeuten. Kleine Werte dieses Parameters resultieren oft aus stabilen (Inversions-)Schichten, die eine scharfe Begrenzung der Grenzschichtoberseite vorgeben.",
     "wblmaxmin.longname": "Maximale Vertikalbewegung (Konvergenz/Divergenz)",
-    "wblmaxmin.description": "Maximale Netto-Vertikalbewegung innerhalb der Grenzschicht, ausgelöst durch konvergente oder divergente Windströmung. Bei positiven Werten können sich Konvergenzlinien bilden. Bei hohem CAPE können außerdem lokale Gewitter ausgelöst werden. Negative Werte (Divergenz) sind assoziiert mit der Bildung von Inversionen in niedriger Höhe.",
+    "wblmaxmin.description": "Maximale kollektive Vertikalbewegung innerhalb der Grenzschicht, ausgelöst durch konvergente oder divergente Windströmung. Bei positiven Werten können sich Konvergenzlinien bilden. Bei hohem CAPE können außerdem lokale Gewitter ausgelöst werden. Negative Werte (Divergenz) sind assoziiert mit der Bildung von Inversionen in niedriger Höhe.",
     "zwblmaxmin.longname": "Höhe der maximalen Vertikalbewegung",
     "zwblmaxmin.description": "Höher (MSL) der Werte aus Maximale Vertikalbewegung (Konvergenz/Divergenz)",
     "sfcsunpct.longname": "Normierte Sonneneinstrahlung",
