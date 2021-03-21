@@ -6,6 +6,7 @@
 // var gTitleImg = document.getElementById("titleImg");
 var gTitleParameter = document.getElementById("titleParameter");
 var gTitleValid = document.getElementById("titleValid");
+var gTitleValidSymbol = document.getElementById("titleValidSymbol");
 var gTitleDrJack = document.getElementById("titleDrJack");
 var gSideScaleImg = document.getElementById("sideScaleImg");
 var gBottomScaleImg = document.getElementById("bottomScaleImg");
@@ -77,7 +78,8 @@ L.Control.RASPControl = L.Control.extend({
 <button onclick='opacityUp()' title='${dict["opacityIncreaseButton_title"]}'><img class='icon' src='img/opacity_plus.svg'></button>
 `;
         this._collapseLink = L.DomUtil.create('a', 'leaflet-control-collapse-button', this._rasp);
-        this._collapseLink.innerHTML = '×';
+        this._collapseLink.innerHTML = '⇱';
+        this._collapseLink.title = 'Panel minimieren';
         this._collapseLink.href = '#collapse';
         L.DomEvent.on(this._collapseLink, 'click', this.collapse, this);
         return this._container;
@@ -321,6 +323,17 @@ function getImageUrls(modelDir, parameter, time) {
     return {overlayUrl: baseUrl + "body.png", sideScaleUrl: baseUrl + "side.png", bottomScaleUrl: baseUrl + "foot.png", titleUrl: titleBaseUrl + "title.json"};
 }
 
+function isValid(dateText, day) {
+    var date = new Date(dateText);
+    var today = new Date();
+    var dateGoal = new Date(today);
+    dateGoal.setDate(dateGoal.getDate() + +day);
+    dateGoal.setHours(0,0,0,0);
+    console.log(date);
+    console.log(dateGoal);
+    return date.valueOf() == dateGoal.valueOf();
+}
+
 function updateOverlay() {
     var modelDir = gModelDaySelect.value;
     var {model, day} = getModelAndDay();
@@ -342,9 +355,14 @@ function updateOverlay() {
         })
         .then(titleJson => {
             gTitleValid.innerHTML = titleJson["validLocal"] + " (" + titleJson["validZulu"] + ") " + titleJson["validDate"] + " [" + titleJson["fcstTime"] + "]";
+            var valid = isValid(titleJson["validDate"], day);
+            gTitleValidSymbol.innerHTML = valid ? "✅" : "❌";
+            gTitleValidSymbol.title = valid ? dict["isValid"] : dict["isNotValid"];
         })
         .catch(err => {
             gTitleValid.innerHTML = "Validity info not found";
+            gTitleValidSymbol.innerHTML = "⚠";
+            gTitleValidSymbol.title = dict["isUnknownValid"];
         });
     gSideScaleImg.src = urls.sideScaleUrl;
     gBottomScaleImg.src = urls.bottomScaleUrl;

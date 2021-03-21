@@ -112,6 +112,11 @@ body {
 /* #titleImg { */
 /*     height: 100%; */
 /* } */
+#titleValidSymbol {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+}
+
 #logoDiv {
     flex: 0 0 auto;
 }
@@ -124,6 +129,7 @@ body {
         height: 35px;
     }
 }
+
 #mapAndScale {
     flex: 1 1 auto;
     min-height: 0; /* This is important! Lets the scale shrink to remaining height */
@@ -179,7 +185,7 @@ body {
     margin-right: 10px;
 }
 .leaflet-control-layers-expanded {
-    padding: 6px 6px 6px 6px;
+    padding: 6px;
 }
 .rasp-control .leaflet-control-layers-toggle {
     background-image: url(/favicon.svg);
