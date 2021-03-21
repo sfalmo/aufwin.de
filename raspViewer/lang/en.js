@@ -20,6 +20,7 @@ var dict = {
     "Airspace": "Airspace",
     "Soundings": "Soundings",
     "Meteograms": "Meteograms",
+    "Show in separate window": "Show in separate window",
     "from": "from",
     "GFSA-initiated": "GFSA-initiated",
     "WRF-ARW model": "WRF-ARW model",

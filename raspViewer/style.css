@@ -119,7 +119,7 @@ body {
     margin: 2px;
     height: 50px;
 }
-@media (max-width: 80ch) {
+@media (max-width: 60ch) {
     #logo {
         height: 35px;
     }
@@ -138,18 +138,18 @@ body {
 
 .imagePopup {
     width: 550px;
-    max-width: 550px;
+    height: 550px;
 }
-@media (max-width: 800px) {
+@media (orientation: portrait) {
     .imagePopup {
-        width: 80vw;
+        max-width: 70vw;
         height: auto;
     }
 }
-@media (max-height: 600px) {
+@media (orientation: landscape) {
     .imagePopup {
         width: auto;
-        height: 80vh;
+        max-height: 60vh;
     }
 }
 

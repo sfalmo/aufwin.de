@@ -20,6 +20,7 @@ var dict = {
     "Airspace": "Lufträume",
     "Soundings": "Temps",
     "Meteograms": "Meteogramme",
+    "Show in separate window": "Separat anzeigen",
     "from": "aus",
     "GFSA-initiated": "GFSA-initialisiertem",
     "WRF-ARW model": "WRF-ARW-Modell",
