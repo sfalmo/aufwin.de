@@ -70,12 +70,14 @@ L.Control.RASPControl = L.Control.extend({
             <summary>${dict["parameterDetails_summary"]}</summary>
             <span id='parameterDescription'></span>
         </details>
+        <button onclick='parameterListToggle()' id='parameterButton' title='${dict["parameterButton_title"]}' value='short'>${dict["parameterButton_SwitchToFull"]}</button>
     </div>
 </div>
-<button onclick='parameterListToggle()' id='parameterButton' title='${dict["parameterButton_title"]}' value='short'>${dict["parameterButton_SwitchToFull"]}</button>
-<br>
-<button onclick='opacityDn()' title='${dict["opacityDecreaseButton_title"]}'><img class='icon' src='img/opacity_minus.svg'></button>
-<button onclick='opacityUp()' title='${dict["opacityIncreaseButton_title"]}'><img class='icon' src='img/opacity_plus.svg'></button>
+<div id='opacityDiv'>
+    <button onclick='opacityDn()' title='${dict["opacityDecreaseButton_title"]}'>-</button>
+    <span style='font-size: 24;'><img class='icon' src='img/opacity.svg' title='${dict["opacityIcon_title"]}'></span>
+    <button onclick='opacityUp()' title='${dict["opacityIncreaseButton_title"]}'>+</button>
+</div>
 `;
         this._collapseLink = L.DomUtil.create('a', 'leaflet-control-collapse-button', this._rasp);
         this._collapseLink.innerHTML = '⇱';

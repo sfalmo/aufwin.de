@@ -14,6 +14,7 @@ var dict = {
     "parameterButton_title": "Toggle between full and reduced parameter set",
     "parameterButton_SwitchToFull": "Switch to Full Parameter List",
     "parameterButton_SwitchToShort": "Switch to Short Parameter List",
+    "opacityIcon_title": "Opacity control",
     "opacityDecreaseButton_title": "Decrease opacity",
     "opacityIncreaseButton_title": "Increase opacity",
     "Topography": "Topography",

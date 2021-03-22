@@ -14,6 +14,7 @@ var dict = {
     "parameterButton_title": "Zwischen voller und reduzierter Parameterliste wechseln",
     "parameterButton_SwitchToFull": "Vollständige Parameterliste anzeigen",
     "parameterButton_SwitchToShort": "Reduzierte Parameterliste anzeigen",
+    "opacityIcon_title": "Deckkraft einstellen",
     "opacityDecreaseButton_title": "Deckkraft verringern",
     "opacityIncreaseButton_title": "Deckkraft erhöhen",
     "Topography": "Topografie",

@@ -190,7 +190,7 @@ body {
 .rasp-control .leaflet-control-layers-toggle {
     background-image: url(/favicon.svg);
 }
-#modelDayTimeParameterDiv > div, #parameterButton {
+#modelDayTimeParameterDiv > div {
     margin-bottom: 4px;
 }
 #parameterSelect {
@@ -228,6 +228,7 @@ body {
 .icon {
     width: 1em;
     height: 1em;
+    vertical-align: middle;
 }
 
 @media (max-width: 800px) {
