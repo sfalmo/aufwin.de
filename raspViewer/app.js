@@ -329,8 +329,6 @@ function isValid(dateText, day) {
     var dateGoal = new Date(today);
     dateGoal.setDate(dateGoal.getDate() + +day);
     dateGoal.setHours(0,0,0,0);
-    console.log(date);
-    console.log(dateGoal);
     return date.valueOf() == dateGoal.valueOf();
 }
 
