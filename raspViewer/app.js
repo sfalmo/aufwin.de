@@ -133,7 +133,17 @@ for (const overlay of cDefaultOverlays) {
 }
 
 // Add layer control
-var gMapControl = L.control.layers(gBaseLayers, gOverlays).addTo(gMap);
+var customLayerControl = L.Control.Layers.extend({
+    expand: function () {
+        gMap.off('click', onMapClick);
+        L.Control.Layers.prototype.expand.call(this);
+    },
+    collapse: function () {
+        gMap.on('click', onMapClick);
+        L.Control.Layers.prototype.collapse.call(this);
+    },
+});
+var gMapControl = new customLayerControl(gBaseLayers, gOverlays).addTo(gMap);
 
 // Add the image layer to the map
 var gImageOverlay = L.imageOverlay(cForecastServerRoot + "/" + cDefaultModel + "/" + cDefaultParameter + ".curr." + cDefaultParameterTime + "lst.d2.body.png",
@@ -152,7 +162,7 @@ gImageOverlayPreload.onerror = () => {
 var gPopupPane = document.getElementsByClassName("leaflet-popup-pane")[0];
 
 gMap.on('click', onMapClick); // left single click
-gMap.on('contextmenu', onMapRightClick); // right single click
+// gMap.on('contextmenu', onMapRightClick); // right single click
 
 addModelDays(); // Initialize all models and days
 
@@ -231,7 +241,7 @@ function opacityDn() {
 // --- Map click handlers ---
 
 function onMapClick() {
-    if (gPopupPane.innerHTML.trim().length == 0) {
+    if (!gPopupPane.hasChildNodes()) {
         gTimeSelect.selectedIndex = getCyclicNextTimeIndex();
         updateOverlay();
     }
