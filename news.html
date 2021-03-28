@@ -1,0 +1,88 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="author" content="Florian Sammüller">
+        <meta name="description" content="Detailliertes Segelflugwetter für Bayern, Thüringen, Sachsen und West-Tschechien mit RASP BLIPMAPS.">
+        <meta name="keywords" content="RASP, BLIPMAPS, Segelflugwetter, Segelflugwetterbericht, Segelfliegen, Wettervorhersage, Thermik, Streckenflug, soaring, gliding, weather, forecast">
+        <title>aufwin.de - Segelflugwettervorhersage mit RASP</title>
+        <link rel="shortcut icon" type="image/x-icon" href="/favicon.svg">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-sm navbar-light bg-light">
+            <a class="navbar-brand" href="/forecast/">
+                <img src="/favicon.svg" width="30" height="30" alt="">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Info</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/news.html">News</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/impressum.html">Impressum</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/datenschutz.html">Datenschutz</a>
+                    </li>
+                </ul>
+                <div class="nav-item ml-auto mr-1" id="toForecast">
+                    <a class="nav-link btn btn-primary" href="/forecast/">zur Vorhersage</a>
+                </div>
+            </div>
+        </nav>
+
+        <div role="main" class="container">
+            <h2>News</h2>
+            <h4>aufwin.de ist online</h4>
+            <h6>18.03.2021</h6>
+            <div class="text-center mb-2">
+                <img src="img/domain_sketch.png" class="rounded img-fluid" style="max-height: 300px;" alt="Karte mit 400km x 400km großem Vorhersagebereich">
+            </div>
+            <p>
+                Ab Mitte März 2021 produziert aufwin.de täglich detaillierte Segelflugwettervorhersagen für den aktuellen sowie den darauffolgenden Tag. Im Moment wird eine 400km x 400km große Region mit Zentrum 50°N 12°E in einer Modellauflösung von 2km abgedeckt, welche Sachsen, Thüringen, einen Großteil Bayerns, Teile der jeweils angrenzenden Bundesländer Baden-Württemberg, Hessen, Sachsen-Anhalt sowie den westlichen Teil Tschechiens einschließt (siehe Bild, inneres Rechteck). Damit beinhaltet der Vorhersagebereich u.a. das Erzgebirge, den Thüringer, Oberpfälzer und Bayerischen Wald sowie Fränkische und Schwäbische Alb, das Thüringer Becken und die Rhön, wodurch diese Seite Wettervorhersagen für viele beliebte Segelflugregionen Deutschlands bietet.<br>
+                Die Vorhersagen basieren auf Modellrechnungen (siehe FAQ), welche täglich gemäß folgendem Zeitplan laufen:
+            </p>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Vorhersagetag</th>
+                        <th>Start</th>
+                        <th>Resultate verfügbar ab ca.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Aktueller Tag</td>
+                        <td>0400Z</td>
+                        <td>0530Z</td>
+                    </tr>
+                    <tr>
+                        <td>Folgetag</td>
+                        <td>0700Z</td>
+                        <td>0830Z</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>
+                Vorhersagekarten zu einer Vielzahl von meteorologischen Parametern sowie Vertikalprofile (Temps) und Meteogramme können <a href="/forecast/">in einer interaktiven Karte</a> betrachtet werden. Zu jedem Parameter gibt es Erläuterungen, welche die Interpretation der Resultate erleichtern.<br>
+                Wir freuen uns über Feedback und Unterstützung, um dieses Projekt auch in den nächsten Jahren weiterführen zu können.
+            </p>
+        </div>
+
+        <hr>
+
+        <div class="text-center">
+            <p>© 2021 aufwin.de | <a href="/impressum.html">Impressum</a> | <a href="/datenschutz.html">Datenschutz</a></p>
+        </div>
+    </body>
+</html>
