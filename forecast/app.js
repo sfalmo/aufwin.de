@@ -404,6 +404,7 @@ function makePopup(e, imageUrl, popupImage) {
     popupContent.appendChild(popupLink);
     popupContent.appendChild(popupImage);
     L.popup({maxWidth: "auto"}).setLatLng(e.target.getLatLng()).setContent(popupContent).openOn(gMap);
+    gImageOverlayLoadingAnimation.style.visibility = "hidden";
 }
 
 function getSoundingMarkers(modelKey) {
@@ -424,6 +425,11 @@ function getSoundingMarkers(modelKey) {
                         makePopup(e, imageUrl, popupImage);
                     };
                     popupImage.src = imageUrl;
+                    setTimeout(() => {
+                        if (!popupImage.complete) {
+                            gImageOverlayLoadingAnimation.style.visibility = "visible";
+                        }
+                    }, cLoadingAnimationDelay);
                 })
         );
     }
@@ -447,6 +453,11 @@ function getMeteogramMarkers(modelKey) {
                         makePopup(e, imageUrl, popupImage);
                     };
                     popupImage.src = imageUrl;
+                    setTimeout(() => {
+                        if (!popupImage.complete) {
+                            gImageOverlayLoadingAnimation.style.visibility = "visible";
+                        }
+                    }, cLoadingAnimationDelay);
                 })
         );
     }
