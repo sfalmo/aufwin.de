@@ -61,7 +61,7 @@ const cParameters = {
     "wstar":         { "longname": dict["wstar.longname"],            "primary": true,     "description": dict["wstar.description"] },
     "bsratio":       { "longname": dict["bsratio.longname"],          "primary": false,    "description": dict["bsratio.description"] },
     "wstar_bsratio": { "longname": dict["wstar_bsratio.longname"],    "primary": true,     "description": dict["wstar_bsratio.description"] },
-    "hglider":       { "longname": dict["hglider.longname"],          "primary": true,     "description": dict["hglider"] },
+    "hglider":       { "longname": dict["hglider.longname"],          "primary": true,     "description": dict["hglider.description"] },
     "hwcrit":        { "longname": dict["hwcrit.longname"],           "primary": true,     "description": dict["hwcrit.description"] },
     "dwcrit":        { "longname": dict["dwcrit.longname"],           "primary": false,    "description": dict["dwcrit.description"] },
     "hbl":           { "longname": dict["hbl.longname"],              "primary": true,     "description": dict["hbl.description"] },

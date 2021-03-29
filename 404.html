@@ -10,19 +10,38 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     </head>
     <body>
-
-        <hr>
-
-        <div class="text-center">
-            <img src="/logo.svg">
-            <h5>Segelflugwettervorhersage mit RASP</h5>
-            <a class="btn btn-primary btn-lg" href="/forecast/">zur Vorhersage</a>
-        </div>
+        <nav class="navbar sticky-top navbar-expand-sm navbar-light bg-light">
+            <a class="navbar-brand" href="/">
+                <img src="/favicon.svg" width="30" height="30" alt="">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/news.html">News</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/impressum.html">Impressum</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/datenschutz.html">Datenschutz</a>
+                    </li>
+                </ul>
+                <div class="nav-item ml-auto mr-1" id="toForecast">
+                    <a class="nav-link btn btn-primary shadow" href="/forecast/">zur Vorhersage</a>
+                </div>
+            </div>
+        </nav>
 
         <hr>
 
         <div role="main" class="container">
             <h2>404 - Seite nicht gefunden</h2>
+            <p>
+                Diese URL gibt es leider nicht. <a href="/forecast/">Hier</a> geht es zu den Vorhersagen.
+            </p>
         </div>
 
         <hr>
