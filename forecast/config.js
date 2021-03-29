@@ -11,12 +11,12 @@ const cModels = {
             "wstar",
             "bsratio",
             "wstar_bsratio",
+            "hglider",
             "hwcrit",
             "dwcrit",
             "hbl",
             "dbl",
             "bltopvariab",
-            // "hglider",
             "wblmaxmin",
             "zwblmaxmin",
             "sfcsunpct",
@@ -123,14 +123,24 @@ const cSoundings = {
         "4": { "name": "Jena",              "location": ["50.9164", "11.7171"] },
         "5": { "name": "Nördlingen",        "location": ["48.8703", "10.5034"] },
         "6": { "name": "Großrückerswalde",  "location": ["50.6431", "13.1274"] },
-        "7": { "name": "Klatovy",           "location": ["49.4172", "13.3215"] }
+        "7": { "name": "Klatovy",           "location": ["49.4172", "13.3215"] },
+        "8": { "name": "Wasserkuppe",       "location": ["50.4989", "9.9541"] },
+        "9": { "name": "Sonnen",            "location": ["48.6823", "13.6949"] }
     }
 };
 
 const cMeteograms = {
     "TIR": {
         // keys: "Someplace" -> meteogram_Someplace, ...
-        "Tirschenreuth": ["49.8741", "12.3272"]
+        "Tirschenreuth":     ["49.8741", "12.3272"],
+        "Oberhinkofen":      ["48.9523", "12.1462"],
+        "Bamberg":           ["49.9179", "10.9121"],
+        "Jena":              ["50.9164", "11.7171"],
+        "Nördlingen":        ["48.8703", "10.5034"],
+        "Großrückerswalde":  ["50.6431", "13.1274"],
+        "Klatovy":           ["49.4172", "13.3215"],
+        "Wasserkuppe":       ["50.4989", "9.9541"],
+        "Sonnen":            ["48.6823", "13.6949"]
     }
 };
 
@@ -167,7 +177,7 @@ const cLoadingAnimationDelay = 300; // ms. Wait this long before showing a loadi
 const cImageOverlayErrorImage = '';
 
 const cDefaultModel = "TIR";                   // default model to start on
-const cDefaultParameter = "wstar";             // which paramter to start on
+const cDefaultParameter = "wstar_bsratio";     // which paramter to start on
 const cDefaultParameterTime = "1300";          // which hour to start on
 const cZoomLocation = 'bottomleft';            // Zoom control position
 const cScaleLocation = 'bottomleft';           // Scale position
