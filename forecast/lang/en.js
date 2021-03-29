@@ -48,6 +48,8 @@ var dict = {
     "bsratio.description": "Ratio of convectively driven updraft strength and vertical wind shear. Thermals may be broken up by vertical wind shear (i.e. wind changing with height) and unworkable if B/S ratio is 5 or less. If convective clouds are present, the actual Buoyancy/Shear Ratio will be better than forecast due to the neglect of cloudsuck.",
     "wstar_bsratio.longname": "Thermal Updraft Velocity & Buoyancy/Shear Ratio",
     "wstar_bsratio.description": "Compound plot of Thermal Updraft Velocity and Buoyancy/Shear Ratio. Regions with small Buoyancy/Shear Ratio are marked by a stipple overlay.",
+    "hglider.longname": "Thermalling Height",
+    "hglider.description": "Usable thermalling height, calculated as the minimum of Height of Critical Updraft Strength, Cumulus Cloudbase and Overdevelopment Cloudbase.",
     "hwcrit.longname": "Height of Critical Updraft Strength",
     "hwcrit.description": "Height at which the average dry updraft strength drops below 225 ft/min (= 1,14 m/s) and thus giving an estimate of the usable thermalling height. In the presence of clouds the latter may instead be limited by the cloud base.",
     "dwcrit.longname": "Depth of Critical Updraft Strength",

@@ -61,12 +61,12 @@ const cParameters = {
     "wstar":         { "longname": dict["wstar.longname"],            "primary": true,     "description": dict["wstar.description"] },
     "bsratio":       { "longname": dict["bsratio.longname"],          "primary": false,    "description": dict["bsratio.description"] },
     "wstar_bsratio": { "longname": dict["wstar_bsratio.longname"],    "primary": true,     "description": dict["wstar_bsratio.description"] },
-    "hwcrit":        { "longname": dict["hwcrit.longname"],           "primary": false,    "description": dict["hwcrit.description"] },
+    "hglider":       { "longname": dict["hglider.longname"],          "primary": true,     "description": dict["hglider"] },
+    "hwcrit":        { "longname": dict["hwcrit.longname"],           "primary": true,     "description": dict["hwcrit.description"] },
     "dwcrit":        { "longname": dict["dwcrit.longname"],           "primary": false,    "description": dict["dwcrit.description"] },
     "hbl":           { "longname": dict["hbl.longname"],              "primary": true,     "description": dict["hbl.description"] },
     "dbl":           { "longname": dict["dbl.longname"],              "primary": false,    "description": dict["dbl.description"] },
     "bltopvariab":   { "longname": dict["bltopvariab.longname"],      "primary": false,    "description": dict["bltopvariab.description"] },
-    // "hglider":       { "longname": dict["hglider.longname"],          "primary": true,     "description": dict["hglider"] }, // is the same as hwcrit
     "wblmaxmin":     { "longname": dict["wblmaxmin.longname"],        "primary": false,    "description": dict["wblmaxmin.description"] },
     "zwblmaxmin":    { "longname": dict["zwblmaxmin.longname"],       "primary": false,    "description": dict["zwblmaxmin.description"] },
     "sfcsunpct":     { "longname": dict["sfcsunpct.longname"],        "primary": true,     "description": dict["sfcsunpct.description"] },
@@ -86,8 +86,8 @@ const cParameters = {
     "zblcl":         { "longname": dict["zblcl.longname"],            "primary": false,    "description": dict["zblcl.description"] },
     "zblclmask":     { "longname": dict["zblclmask.longname"],        "primary": true,     "description": dict["zblclmask.description"] },
     "blicw":         { "longname": dict["blicw.longname"],            "primary": false,    "description": dict["blicw.description"] }, // maybe get rid of this (DrJack does not know if it is useful because the formula used is so simple)
-    "blcwbase":      { "longname": dict["blcwbase.longname"],         "primary": false,    "description": dict["blcwbase.description"] }, // also this
-    "blcloudpct":    { "longname": dict["blcloudpct.longname"],       "primary": true,     "description": dict["blcloudpct.description"] }, // and this
+    "blcwbase":      { "longname": dict["blcwbase.longname"],         "primary": false,    "description": dict["blcwbase.description"] },
+    "blcloudpct":    { "longname": dict["blcloudpct.longname"],       "primary": true,     "description": dict["blcloudpct.description"] },
     "wrf=CFRACL":    { "longname": dict["wrf=CFRACL.longname"],       "primary": false,    "description": dict["wrf=CFRACL.description"] },
     "wrf=CFRACM":    { "longname": dict["wrf=CFRACM.longname"],       "primary": false,    "description": dict["wrf=CFRACM.description"] },
     "wrf=CFRACH":    { "longname": dict["wrf=CFRACH.longname"],       "primary": false,    "description": dict["wrf=CFRACH.description"] },
