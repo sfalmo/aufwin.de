@@ -440,10 +440,10 @@ function getMeteogramMarkers(modelKey) {
     var markers = [];
     var meteograms = cMeteograms[modelKey];
     for (const meteogramKey of Object.keys(meteograms)) {
-        var location = meteograms[meteogramKey];
+        var meteogram = meteograms[meteogramKey];
         markers.push(
-            L.marker(location, {icon: gMeteogramIcon})
-                .bindTooltip(meteogramKey)
+            L.marker(meteogram.location, {icon: gMeteogramIcon})
+                .bindTooltip(meteogram.name)
                 .on('click', function(e) {
                     var modelDir = gModelDaySelect.value;
                     var imageUrl = cForecastServerRoot + "/" + modelDir + "/meteogram_" + meteogramKey + ".png";

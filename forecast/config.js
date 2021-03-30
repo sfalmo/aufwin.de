@@ -132,15 +132,15 @@ const cSoundings = {
 const cMeteograms = {
     "TIR": {
         // keys: "Someplace" -> meteogram_Someplace, ...
-        "Tirschenreuth":     ["49.8741", "12.3272"],
-        "Oberhinkofen":      ["48.9523", "12.1462"],
-        "Bamberg":           ["49.9179", "10.9121"],
-        "Jena":              ["50.9164", "11.7171"],
-        "Nördlingen":        ["48.8703", "10.5034"],
-        "Großrückerswalde":  ["50.6431", "13.1274"],
-        "Klatovy":           ["49.4172", "13.3215"],
-        "Wasserkuppe":       ["50.4989", "9.9541"],
-        "Sonnen":            ["48.6823", "13.6949"]
+        "Tirschenreuth":      { "name": "Tirschenreuth",     "location": ["49.8741", "12.3272"]},
+        "Oberhinkofen":       { "name": "Oberhinkofen",      "location": ["48.9523", "12.1462"]},
+        "Bamberg":            { "name": "Bamberg",           "location": ["49.9179", "10.9121"]},
+        "Jena":               { "name": "Jena",              "location": ["50.9164", "11.7171"]},
+        "Noerdlingen":        { "name": "Nördlingen",        "location": ["48.8703", "10.5034"]},
+        "Grossrueckerswalde": { "name": "Großrückerswalde",  "location": ["50.6431", "13.1274"]},
+        "Klatovy":            { "name": "Klatovy",           "location": ["49.4172", "13.3215"]},
+        "Wasserkuppe":        { "name": "Wasserkuppe",       "location": ["50.4989", "9.9541"]},
+        "Sonnen":             { "name": "Sonnen",            "location": ["48.6823", "13.6949"]}
     }
 };
 
