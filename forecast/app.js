@@ -78,6 +78,16 @@ L.Control.RASPControl = L.Control.extend({
     <span style='font-size: 24;'><img class='icon' src='img/opacity.svg' title='${dict["opacityIcon_title"]}'></span>
     <button onclick='opacityUp()' title='${dict["opacityIncreaseButton_title"]}'>+</button>
 </div>
+<div id='markerDiv'>
+    <label>
+        <input type="checkbox" id="soundingCheckbox" onchange="toggleSoundingsOrMeteograms()">
+        <span>${dict["Soundings"]}</span>
+    </label>
+    <label>
+        <input type="checkbox" id="meteogramCheckbox" onchange="toggleSoundingsOrMeteograms()">
+        <span>${dict["Meteograms"]}</span>
+    </label>
+</div>
 `;
         this._collapseLink = L.DomUtil.create('a', 'leaflet-control-collapse-button', this._rasp);
         this._collapseLink.innerHTML = '⇱';
@@ -111,6 +121,8 @@ var gTimeSelect = document.getElementById("timeSelect");
 var gParameterSelect = document.getElementById("parameterSelect");
 var gParameterButton = document.getElementById("parameterButton");
 var gParameterDescription = document.getElementById("parameterDescription");
+var gSoundingCheckbox = document.getElementById("soundingCheckbox");
+var gMeteogramCheckbox = document.getElementById("meteogramCheckbox");
 
 // Leaflet needs this because the flexbox it is in does not evaluate to the right height at the beginning
 // Otherwise, bottom tiles are not loaded (because leaflet thinks they are out of scope)
@@ -124,8 +136,6 @@ var gOpacityDelta = cDefaultOpacityDelta;
 
 var gBaseLayers = cBaseLayers;
 var gOverlays = cOverlays;
-gOverlays[dict["Soundings"]] = getSoundingMarkers(cDefaultModel); // Add soundings for default model to overlays
-gOverlays[dict["Meteograms"]] = getMeteogramMarkers(cDefaultModel); // Add meteograms for default model to overlays
 
 gBaseLayers[cDefaultBaseLayer].addTo(gMap);
 for (const overlay of cDefaultOverlays) {
@@ -158,6 +168,9 @@ gImageOverlayPreload.onerror = () => {
     gImageOverlay.setUrl(cImageOverlayErrorImage);
     gImageOverlayLoadingAnimation.style.visibility = "hidden";
 };
+
+var gSoundingOverlay = getSoundingMarkers(cDefaultModel);
+var gMeteogramOverlay = getMeteogramMarkers(cDefaultModel);
 
 var gPopupPane = document.getElementsByClassName("leaflet-popup-pane")[0];
 
@@ -405,6 +418,19 @@ function makePopup(e, imageUrl, popupImage) {
     popupContent.appendChild(popupImage);
     L.popup({maxWidth: "auto"}).setLatLng(e.target.getLatLng()).setContent(popupContent).openOn(gMap);
     gImageOverlayLoadingAnimation.style.visibility = "hidden";
+}
+
+function toggleSoundingsOrMeteograms() {
+    if (gSoundingCheckbox.checked) {
+        gSoundingOverlay.addTo(gMap);
+    } else {
+        gSoundingOverlay.remove();
+    }
+    if (gMeteogramCheckbox.checked) {
+        gMeteogramOverlay.addTo(gMap);
+    } else {
+        gMeteogramOverlay.remove();
+    }
 }
 
 function getSoundingMarkers(modelKey) {

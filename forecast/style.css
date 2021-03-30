@@ -211,6 +211,9 @@ body {
     max-height: 8em;
     overflow-y: auto;
 }
+#markerDiv label {
+    display: inline-block;
+}
 .leaflet-container a.leaflet-control-collapse-button {
     position: absolute;
     bottom: 0;
