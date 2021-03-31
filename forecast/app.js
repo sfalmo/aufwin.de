@@ -419,7 +419,7 @@ function updateOverlay() {
             gTitleValidSymbol.title = valid ? dict["isValid"] : dict["isNotValid"];
         })
         .catch(err => {
-            gTitleValid.innerHTML = "Validity info not found";
+            gTitleValid.innerHTML = dict["validityUnknown"];
             gTitleValidSymbol.innerHTML = "⚠";
             gTitleValidSymbol.title = dict["isUnknownValid"];
         });
