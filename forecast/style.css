@@ -182,6 +182,46 @@ body {
     }
 }
 
+.leaflet-container .leaflet-control-attribution {
+    padding: 2px 6px;
+    background: rgba(255, 255, 255, 0.9);
+}
+.leaflet-container .leaflet-control-attribution.leaflet-compact-attribution {
+    width: auto !important;
+    margin: 10px 44px 0 10px;
+    padding: 7px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.9);
+    visibility: hidden;
+}
+.leaflet-compact-attribution-label:after {
+    content: 'ⓘ';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background: white;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    line-height: 28px;
+    text-align: center;
+    font-size: 18px;
+    cursor: pointer;
+    visibility: visible;
+}
+.leaflet-compact-attribution-toggle, .leaflet-compact-attribution-label {
+    display: none;
+}
+.leaflet-compact-attribution ~ .leaflet-compact-attribution-label {
+    display: block;
+}
+.leaflet-compact-attribution-toggle:checked ~ .leaflet-control-attribution.leaflet-compact-attribution {
+    visibility: visible;
+}
+
 .leaflet-control-layers {
     max-width: 80ch;
     margin-right: 60px;
@@ -199,6 +239,13 @@ body {
 }
 #modelDayTimeParameterDiv > div {
     margin-bottom: 4px;
+}
+#parameterListDiv {
+    white-space: nowrap;
+}
+#parameterSelect {
+    /* Mind the space occupied by the parameter toggle button */
+    width: calc(100% - 3em);
 }
 #parameterDiv > details {
     padding-top: 2px;
