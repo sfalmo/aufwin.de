@@ -183,6 +183,7 @@ body {
 }
 
 .leaflet-control-layers {
+    max-width: 80ch;
     margin-right: 60px;
 }
 .leaflet-control-layers-expanded {
@@ -191,11 +192,13 @@ body {
 .rasp-control .leaflet-control-layers-toggle {
     background-image: url(img/rasp_control.svg);
 }
+.rasp-control button {
+    width: 3em;
+    padding-left: 0px;
+    padding-right: 0px;
+}
 #modelDayTimeParameterDiv > div {
     margin-bottom: 4px;
-}
-#parameterSelect {
-    width: 100%;
 }
 #parameterDiv > details {
     padding-top: 2px;
@@ -203,16 +206,12 @@ body {
     padding-left: 5px;
     padding-right: 5px;
 }
-#parameterDiv > details[open] {
-    max-width: 80ch;
-}
 #parameterDescription {
-    display: inline-block;
     max-height: 8em;
     overflow-y: auto;
 }
 #markerDiv label {
-    display: inline-block;
+    display: inline;
 }
 .leaflet-container a.leaflet-control-collapse-button {
     position: absolute;

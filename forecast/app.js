@@ -65,25 +65,26 @@ L.Control.RASPControl = L.Control.extend({
         <select onchange='timeChange()' id='timeSelect' title='${dict["timeSelect_title"]}' size='1'></select>
     </div>
     <div id='parameterDiv'>
-        <select onchange='parameterChange()' id='parameterSelect' title='${dict["parameterSelect_title"]}' size='1'></select>
+        <div id='parameterListDiv'>
+            <button onclick='parameterListToggle()' id='parameterButton' title='${dict["parameterButton_title"]}' value='short'>+</button><select onchange='parameterChange()' id='parameterSelect' title='${dict["parameterSelect_title"]}' size='1'></select>
+        </div>
         <details title='${dict["parameterDetails_title"]}'>
             <summary>${dict["parameterDetails_summary"]}</summary>
             <span id='parameterDescription'></span>
         </details>
-        <button onclick='parameterListToggle()' id='parameterButton' title='${dict["parameterButton_title"]}' value='short'>${dict["parameterButton_SwitchToFull"]}</button>
     </div>
 </div>
 <div id='opacityDiv'>
-    <button onclick='opacityDn()' title='${dict["opacityDecreaseButton_title"]}'>-</button>
+    <button onclick='opacityDn()' title='${dict["opacityDecreaseButton_title"]}'>−</button>
     <span style='font-size: 24;'><img class='icon' src='img/opacity.svg' title='${dict["opacityIcon_title"]}'></span>
     <button onclick='opacityUp()' title='${dict["opacityIncreaseButton_title"]}'>+</button>
 </div>
 <div id='markerDiv'>
-    <label>
+    <label title='${dict["soundingCheckbox_label"]}'>
         <input type="checkbox" id="soundingCheckbox" onchange="toggleSoundingsOrMeteograms()">
         <span>${dict["Soundings"]}</span>
     </label>
-    <label>
+    <label title='${dict["meteogramCheckbox_label"]}'>
         <input type="checkbox" id="meteogramCheckbox" onchange="toggleSoundingsOrMeteograms()">
         <span>${dict["Meteograms"]}</span>
     </label>
@@ -229,10 +230,10 @@ function parameterListToggle() {
     // Toggle button
     if (gParameterButton.value == "short") {
         gParameterButton.value = "long";
-        gParameterButton.innerHTML = dict["parameterButton_SwitchToShort"];
+        gParameterButton.innerHTML = "−";
     } else {
         gParameterButton.value = "short";
-        gParameterButton.innerHTML = dict["parameterButton_SwitchToFull"];
+        gParameterButton.innerHTML = "+";
     }
 
     gParameterSelect.options.length = 0; // Clear the parameters
