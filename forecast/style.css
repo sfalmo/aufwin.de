@@ -200,15 +200,15 @@ body {
     right: 0;
     bottom: 0;
     z-index: 1;
-    display: inline-block;
     width: 30px;
     height: 30px;
     background: white;
     border-radius: 50%;
     border: 1px solid #ccc;
-    line-height: 28px;
-    text-align: center;
-    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
     cursor: pointer;
     visibility: visible;
 }
@@ -223,8 +223,8 @@ body {
 }
 
 .leaflet-control-layers {
-    max-width: 80ch;
     margin-right: 60px;
+    max-width: 80ch;
 }
 .leaflet-control-layers-expanded {
     padding: 6px;
@@ -254,11 +254,12 @@ body {
     padding-right: 5px;
 }
 #parameterDescription {
+    display: inline-block;
     max-height: 8em;
     overflow-y: auto;
 }
 #markerDiv label {
-    display: inline;
+    display: inline-block;
 }
 .leaflet-container a.leaflet-control-collapse-button {
     position: absolute;
