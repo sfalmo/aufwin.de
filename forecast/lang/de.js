@@ -26,7 +26,7 @@ var dict = {
     "isValid": "Daten gültig",
     "isNotValid": "Daten veraltet. Bitte Zeitplan der Simulationsläufe beachten.",
     "isUnknownValid": "Gültigkeit der Daten konnte nicht bestimmt werden. Vermutlich fehlen die Daten.",
-    "validityUnknown": "Gültigkeits-Info nicht gefunden.",
+    "validityUnknown": "Gültigkeits-Info nicht gefunden",
     "from": "aus",
     "GFSA-initiated": "GFSA-initialisiertem",
     "WRF-ARW model": "WRF-ARW-Modell",
