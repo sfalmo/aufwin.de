@@ -11,6 +11,7 @@ var gTitleDrJack = document.getElementById("titleDrJack");
 var gSideScaleImg = document.getElementById("sideScaleImg");
 var gBottomScaleImg = document.getElementById("bottomScaleImg");
 var gImageOverlayLoadingAnimation = document.getElementById("loadingDiv");
+gImageOverlayLoadingAnimation.style.visibility = 'hidden';
 
 var gSoundingIcon = L.icon({
     iconUrl: cSoundingMarker,
@@ -191,20 +192,6 @@ var customLayerControl = L.Control.Layers.extend({
 });
 var gMapControl = new customLayerControl(gBaseLayers, gOverlays).addTo(gMap);
 
-// Add the image layer to the map
-var gImageOverlay = L.imageOverlay(cForecastServerRoot + "/" + cDefaultModel + "/" + cDefaultParameter + ".curr." + cDefaultParameterTime + "lst.d2.body.png",
-                                   [cModels[cDefaultModel].swcorner, cModels[cDefaultModel].necorner],
-                                   {opacity: gOpacityLevel}).addTo(gMap);
-var gImageOverlayPreload = new Image();
-gImageOverlayPreload.onload = () => {
-    gImageOverlay.setUrl(gImageOverlayPreload.src);
-    gImageOverlayLoadingAnimation.style.visibility = "hidden";
-};
-gImageOverlayPreload.onerror = () => {
-    gImageOverlay.setUrl(cImageOverlayErrorImage);
-    gImageOverlayLoadingAnimation.style.visibility = "hidden";
-};
-
 var gSoundingOverlay = getSoundingMarkers(cDefaultModel);
 var gMeteogramOverlay = getMeteogramMarkers(cDefaultModel);
 
@@ -246,7 +233,6 @@ function modelDayChange() {
     addModelHours(model, day, gTimeSelect.value); // could have different hours
     addModelParameters(model); // could have different parameters
     gTitleDrJack.innerHTML = "DrJack BLIPMAP " + dict["from"] + " RASP " + dict["GFSA-initiated"] + " " + cModels[model].resolution + "km " + dict["WRF-ARW model"];
-    gImageOverlay.setBounds([cModels[model].swcorner, cModels[model].necorner]); // set bounds
     gMap.setView(cModels[model].center, cModels[model].zoom); // recenter the map
     parameterChange();
 }
@@ -279,12 +265,10 @@ function parameterListToggle() {
 
 function opacityUp() {
     gOpacityLevel = Math.min(gOpacityLevel + gOpacityDelta, 1);
-    gImageOverlay.setOpacity(gOpacityLevel);
 }
 
 function opacityDn() {
     gOpacityLevel = Math.max(gOpacityLevel - gOpacityDelta, 0);
-    gImageOverlay.setOpacity(gOpacityLevel);
 }
 
 // --- Map click handlers ---
@@ -380,8 +364,7 @@ function getImageUrls(modelDir, parameter, time) {
         baseUrl += "curr."+time+"lst.d2.";
         titleBaseUrl += "curr."+time+"lst.d2.";
     }
-    // return {overlayUrl: baseURL + "body.png", sideScaleUrl: baseURL + "side.png", bottomScaleUrl: baseURL + "foot.png", titleUrl: baseURL + "head.png"};
-    return {overlayUrl: baseUrl + "body.png", sideScaleUrl: baseUrl + "side.png", bottomScaleUrl: baseUrl + "foot.png", titleUrl: titleBaseUrl + "title.json"};
+    return {geotiffUrl: baseUrl + "data.tiff", titleUrl: titleBaseUrl + "title.json"};
 }
 
 function isValid(dateText, day) {
@@ -406,7 +389,6 @@ function updateOverlay() {
         gMap.on('click', onMapClick);
     }
     var urls = getImageUrls(modelDir, parameter, time);
-    // gTitleImg.src = urls.titleUrl;
     gTitleParameter.innerHTML = cParameters[parameter].longname;
     fetch(urls.titleUrl)
         .then(response => {
@@ -423,22 +405,54 @@ function updateOverlay() {
             gTitleValidSymbol.innerHTML = "⚠";
             gTitleValidSymbol.title = dict["isUnknownValid"];
         });
-    gSideScaleImg.src = urls.sideScaleUrl;
-    gBottomScaleImg.src = urls.bottomScaleUrl;
 
-    gImageOverlayPreload.src = urls.overlayUrl;  // Preload the image. Callback will hand the image over to real overlay when it has finished loading.
-    // Wait a bit before showing the loading animation.
-    // This prevents rapid flickering of the loading icon when switching overlays with a fast internet connection but still gives a loading feedback for people with slower internet.
-    // Tweak loading icon delay in config.
-    setTimeout(() => {
-        if (!gImageOverlayPreload.complete) {
-            gImageOverlayLoadingAnimation.style.visibility = "visible";
+    // console.log(GeoTIFF);
+    // GeoTIFF.fromUrl(urls.geotiffUrl)
+    //     .then(tiff => console.log(tiff));
+
+    fetch(urls.geotiffUrl)
+        .then(response => response.arrayBuffer())
+        .then(parseGeoraster)
+        // .then(georaster => // plotData(georaster)
+        //     {
+        //         var layer = new GeoRasterLayer({
+        //             georaster: georaster,
+        //             opacity: 0.5,
+        //             // pixelValuesToColorFn: values => values[0] > 150 ? '#ffffff' : '#000000',
+        //             resolution: 256 // optional parameter for adjusting display resolution
+        //         });
+        //         layer.addTo(gMap);
+        //     });
+        .then(georaster => plotRaster(georaster, 0));
+}
+
+function plotRaster(georaster, dataset) {
+    console.log(georaster);
+    let the_canvas = document.createElement('canvas'); // create an offscreen canvas for rendering
+    console.log(georaster.values[0][0][0]);
+    var data = new Float32Array(georaster.width * georaster.height);
+    for (var i = 0; i < georaster.height; i++) {
+        for (var j = 0; j < georaster.width; j++) {
+            data[i * georaster.width + j] = georaster.values[0][i][j];
         }
-    }, cLoadingAnimationDelay);
-
-    // Maybe we should preload the next timepoint
-    // var nextTime = gTimeSelect[getCyclicNextTimeIndex()].value;
-    // var nextUrls = getImageUrls(modelDir, parameter, nextTime);
+    }
+    var plot = new plotty.plot({
+        canvas: the_canvas,
+        data: data,
+        width: georaster.width,
+        height: georaster.height,
+        domain: [georaster.mins[dataset], georaster.maxs[dataset]],
+        clampLow: true,
+        clampHigh: true,
+        noDataValue: georaster.noDataValue,
+        colorScale: 'viridis'
+    });
+    plot.render();
+    console.log(plot);
+    var bounds = [[georaster.ymin, georaster.xmin], [georaster.ymax, georaster.xmax]];
+    var overlay = L.imageOverlay(the_canvas.toDataURL(), bounds, {
+        opacity: 0.6
+    }).addTo(gMap);
 }
 
 // --- Soundings and meteograms ---

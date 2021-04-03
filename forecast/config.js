@@ -177,7 +177,7 @@ const cLoadingAnimationDelay = 300; // ms. Wait this long before showing a loadi
 const cImageOverlayErrorImage = '';
 
 const cDefaultModel = "TIR";                   // default model to start on
-const cDefaultParameter = "wstar_bsratio";     // which paramter to start on
+const cDefaultParameter = "wstar";     // which paramter to start on
 const cDefaultParameterTime = "1300";          // which hour to start on
 const cZoomLocation = 'bottomleft';            // Zoom control position
 const cScaleLocation = 'bottomleft';           // Scale position
