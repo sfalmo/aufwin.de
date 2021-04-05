@@ -58,16 +58,16 @@ const cModels = {
 };
 
 const cParameters = {
-    "wstar":         { "longname": dict["wstar.longname"],            "primary": true,     "description": dict["wstar.description"] },
+    "wstar":         { "longname": dict["wstar.longname"],            "primary": false,    "description": dict["wstar.description"] },
     "bsratio":       { "longname": dict["bsratio.longname"],          "primary": false,    "description": dict["bsratio.description"] },
     "wstar_bsratio": { "longname": dict["wstar_bsratio.longname"],    "primary": true,     "description": dict["wstar_bsratio.description"] },
     "hglider":       { "longname": dict["hglider.longname"],          "primary": true,     "description": dict["hglider.description"] },
-    "hwcrit":        { "longname": dict["hwcrit.longname"],           "primary": true,     "description": dict["hwcrit.description"] },
+    "hwcrit":        { "longname": dict["hwcrit.longname"],           "primary": false,    "description": dict["hwcrit.description"] },
     "dwcrit":        { "longname": dict["dwcrit.longname"],           "primary": false,    "description": dict["dwcrit.description"] },
-    "hbl":           { "longname": dict["hbl.longname"],              "primary": true,     "description": dict["hbl.description"] },
+    "hbl":           { "longname": dict["hbl.longname"],              "primary": false,    "description": dict["hbl.description"] },
     "dbl":           { "longname": dict["dbl.longname"],              "primary": false,    "description": dict["dbl.description"] },
     "bltopvariab":   { "longname": dict["bltopvariab.longname"],      "primary": false,    "description": dict["bltopvariab.description"] },
-    "wblmaxmin":     { "longname": dict["wblmaxmin.longname"],        "primary": false,    "description": dict["wblmaxmin.description"] },
+    "wblmaxmin":     { "longname": dict["wblmaxmin.longname"],        "primary": true,     "description": dict["wblmaxmin.description"] },
     "zwblmaxmin":    { "longname": dict["zwblmaxmin.longname"],       "primary": false,    "description": dict["zwblmaxmin.description"] },
     "sfcsunpct":     { "longname": dict["sfcsunpct.longname"],        "primary": true,     "description": dict["sfcsunpct.description"] },
     "sfcshf":        { "longname": dict["sfcshf.longname"],           "primary": false,    "description": dict["sfcshf.description"] },
