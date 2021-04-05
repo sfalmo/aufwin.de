@@ -160,24 +160,43 @@ body {
     }
 }
 
-#sideScaleImg {
+#sideScaleDiv {
     flex: 1 1 auto;
-    width: auto;
+    width: 50px;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.scaleUnits, .scaleMax, .scaleMin {
+    text-align: center;
     padding: 5px;
 }
-#bottomScaleImg {
+
+.scaleUnits {
+    font-weight: bold;
+}
+
+.sideScaleCanvas {
+    flex: 1 1 auto;
     width: 100%;
-    height: auto;
-    padding: 5px;
+    height: 100%;
+}
+
+#bottomScaleDiv {
+    flex: 0 1 auto;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    flex-direction: row;
 }
 @media (orientation: landscape) {
-    #bottomScaleImg {
+    #bottomScaleDiv {
         display: none;
     }
 }
 @media (orientation: portrait) {
-    #sideScaleImg {
+    #sideScaleDiv {
         display: none;
     }
 }
@@ -237,28 +256,28 @@ body {
     padding-left: 0px;
     padding-right: 0px;
 }
-#modelDayTimeParameterDiv > div {
+.modelDayTimeParameterDiv > div {
     margin-bottom: 4px;
 }
-#parameterListDiv {
+.parameterListDiv {
     white-space: nowrap;
 }
-#parameterSelect {
+.parameterSelect {
     /* Mind the space occupied by the parameter toggle button */
     width: calc(100% - 3em);
 }
-#parameterDiv > details {
+.parameterDiv > details {
     padding-top: 2px;
     padding-bottom: 2px;
     padding-left: 5px;
     padding-right: 5px;
 }
-#parameterDescription {
+.parameterDescription {
     display: inline-block;
     max-height: 8em;
     overflow-y: auto;
 }
-#markerDiv label {
+.markerDiv label {
     display: inline-block;
 }
 .leaflet-container a.leaflet-control-collapse-button {
@@ -282,6 +301,8 @@ body {
 }
 
 .icon {
+    padding-left: 2px;
+    padding-right: 2px;
     width: 1em;
     height: 1em;
     vertical-align: middle;

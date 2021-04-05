@@ -16,12 +16,11 @@
         <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
                 integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
                 crossorigin=""></script>
-        <!-- Own style with overwrites -->
-        <link rel="stylesheet" href="style.css">
         <script src="https://unpkg.com/georaster"></script>
         <!-- <script src="https://unpkg.com/geotiff"></script> -->
-        <!-- <script src="https://cdn.jsdelivr.net/npm/geotiff"></script> -->
         <script src="plotty.min.js"></script>
+        <!-- Own style with overwrites -->
+        <link rel="stylesheet" href="style.css">
         <noscript>
             <h1>This page requires JavaScript to be enabled</h1>
         </noscript>
@@ -47,24 +46,27 @@
             <a href="/">Info</a>
         </div>
         <div id="top">
-            <div id="titleDiv">
-                <h2 id="titleParameter"></h2>
-                <h3><span id="titleValid"></span> <span id="titleValidSymbol"></span></h3>
-                <h6 id="titleDrJack"></h6>
-                <!-- <img id='titleImg' alt='Parameter Information'> -->
-            </div>
+            <div id="titleDiv"></div>
             <div id="logoDiv">
                 <a href="/"><img id='logo' src="/logo.svg" alt='aufwin.de - Logo'></a>
             </div>
         </div>
         <div id='mapAndScale'>
             <div id='map'></div>
-            <img id='sideScaleImg' alt='Side Scale'>
+            <div id="sideScaleDiv">
+                <!-- <div class="scaleUnits">cm/s</div> -->
+                <!-- <div class="scaleMax">500</div> -->
+                <!-- <canvas id='sideScaleCanvas' width="1" height="256"></canvas> -->
+                <!-- <div class="scaleMin">0</div> -->
+            </div>
         </div>
-        <img id='bottomScaleImg' alt='Bottom Scale'>
+        <div id="bottomScaleDiv">
+            <!-- <div class="scaleMin">0</div> -->
+            <!-- <canvas id='bottomScaleCanvas' width="256" height="1"></canvas> -->
+            <!-- <div class="scaleMax">500</div> -->
+            <!-- <div class="scaleUnits">cm/s</div> -->
+        </div>
 
-        <script src="config.js"></script>
-        <script src="app.js"></script>
-        <!-- <script src="infomodal.js"></script> -->
+        <script type="module" src="app.js"></script>
     </body>
 </html>

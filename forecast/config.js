@@ -57,48 +57,49 @@ const cModels = {
     }
 };
 
+// Key is taken from RASP. Longname and description self explanatory. Primary: appears in short parameter list. Domain: default range of scale
 const cParameters = {
-    "wstar":         { "longname": dict["wstar.longname"],            "primary": true,     "description": dict["wstar.description"] },
-    "bsratio":       { "longname": dict["bsratio.longname"],          "primary": false,    "description": dict["bsratio.description"] },
+    "wstar":         { "longname": dict["wstar.longname"],            "primary": true,     "description": dict["wstar.description"], units: "cm/s", domain: [0, 500] },
+    "bsratio":       { "longname": dict["bsratio.longname"],          "primary": false,    "description": dict["bsratio.description"], units: "", domain: [0, 10] },
     "wstar_bsratio": { "longname": dict["wstar_bsratio.longname"],    "primary": true,     "description": dict["wstar_bsratio.description"] },
-    "hglider":       { "longname": dict["hglider.longname"],          "primary": true,     "description": dict["hglider.description"] },
-    "hwcrit":        { "longname": dict["hwcrit.longname"],           "primary": true,     "description": dict["hwcrit.description"] },
-    "dwcrit":        { "longname": dict["dwcrit.longname"],           "primary": false,    "description": dict["dwcrit.description"] },
-    "hbl":           { "longname": dict["hbl.longname"],              "primary": true,     "description": dict["hbl.description"] },
-    "dbl":           { "longname": dict["dbl.longname"],              "primary": false,    "description": dict["dbl.description"] },
-    "bltopvariab":   { "longname": dict["bltopvariab.longname"],      "primary": false,    "description": dict["bltopvariab.description"] },
-    "wblmaxmin":     { "longname": dict["wblmaxmin.longname"],        "primary": false,    "description": dict["wblmaxmin.description"] },
-    "zwblmaxmin":    { "longname": dict["zwblmaxmin.longname"],       "primary": false,    "description": dict["zwblmaxmin.description"] },
-    "sfcsunpct":     { "longname": dict["sfcsunpct.longname"],        "primary": true,     "description": dict["sfcsunpct.description"] },
-    "sfcshf":        { "longname": dict["sfcshf.longname"],           "primary": false,    "description": dict["sfcshf.description"] },
-    "sfctemp":       { "longname": dict["sfctemp.longname"],          "primary": true,     "description": dict["sfctemp.description"] },
-    "sfcdewpt":      { "longname": dict["sfcdewpt.longname"],         "primary": true,     "description": dict["sfcdewpt.description"] },
-    "mslpress":      { "longname": dict["mslpress.longname"],         "primary": false,    "description": dict["mslpress.description"] },
+    "hglider":       { "longname": dict["hglider.longname"],          "primary": true,     "description": dict["hglider.description"], units: "m", domain: [0, 3000] },
+    "hwcrit":        { "longname": dict["hwcrit.longname"],           "primary": true,     "description": dict["hwcrit.description"], units: "m", domain: [0, 3000] },
+    "dwcrit":        { "longname": dict["dwcrit.longname"],           "primary": false,    "description": dict["dwcrit.description"], units: "m", domain: [0, 3000] },
+    "hbl":           { "longname": dict["hbl.longname"],              "primary": true,     "description": dict["hbl.description"], units: "m", domain: [0, 3000] },
+    "dbl":           { "longname": dict["dbl.longname"],              "primary": false,    "description": dict["dbl.description"], units: "m", domain: [0, 3000] },
+    "bltopvariab":   { "longname": dict["bltopvariab.longname"],      "primary": false,    "description": dict["bltopvariab.description"], units: "m", domain: [0, 1000] },
+    "wblmaxmin":     { "longname": dict["wblmaxmin.longname"],        "primary": false,    "description": dict["wblmaxmin.description"], units: "cm/s", domain: [-250, 250] },
+    "zwblmaxmin":    { "longname": dict["zwblmaxmin.longname"],       "primary": false,    "description": dict["zwblmaxmin.description"], units: "m", domain: [0, 3000] },
+    "sfcsunpct":     { "longname": dict["sfcsunpct.longname"],        "primary": true,     "description": dict["sfcsunpct.description"], units: "", domain: [0, 100] },
+    "sfcshf":        { "longname": dict["sfcshf.longname"],           "primary": false,    "description": dict["sfcshf.description"], units: "W/m²", domain: [0, 100] },
+    "sfctemp":       { "longname": dict["sfctemp.longname"],          "primary": true,     "description": dict["sfctemp.description"], units: "°C", domain: [-10, 40] },
+    "sfcdewpt":      { "longname": dict["sfcdewpt.longname"],         "primary": true,     "description": dict["sfcdewpt.description"], units: "°C", domain: [-10, 40] },
+    "mslpress":      { "longname": dict["mslpress.longname"],         "primary": false,    "description": dict["mslpress.description"], units: "hPa" },
     "sfcwind0":      { "longname": dict["sfcwind0.longname"],         "primary": true,     "description": dict["sfcwind0.description"] },
     "sfcwind":       { "longname": dict["sfcwind.longname"],          "primary": false,    "description": dict["sfcwind.description"] },
     "blwind":        { "longname": dict["blwind.longname"],           "primary": true,     "description": dict["blwind.description"] },
     "bltopwind":     { "longname": dict["bltopwind.longname"],        "primary": false,    "description": dict["bltopwind.description"] },
     "blwindshear":   { "longname": dict["blwindshear.longname"],      "primary": false,    "description": dict["blwindshear.description"] },
     "zsfclcldif":    { "longname": dict["zsfclcldif.longname"],       "primary": false,    "description": dict["zsfclcldif.description"] },
-    "zsfclcl":       { "longname": dict["zsfclcl.longname"],          "primary": false,    "description": dict["zsfclcl.description"] },
+    "zsfclcl":       { "longname": dict["zsfclcl.longname"],          "primary": false,    "description": dict["zsfclcl.description"], units: "m", domain: [0, 3000] },
     "zsfclclmask":   { "longname": dict["zsfclclmask.longname"],      "primary": true,     "description": dict["zsfclclmask.description"] },
     "zblcldif":      { "longname": dict["zblcldif.longname"],         "primary": false,    "description": dict["zblcldif.description"] },
-    "zblcl":         { "longname": dict["zblcl.longname"],            "primary": false,    "description": dict["zblcl.description"] },
+    "zblcl":         { "longname": dict["zblcl.longname"],            "primary": false,    "description": dict["zblcl.description"], units: "m", domain: [0, 3000] },
     "zblclmask":     { "longname": dict["zblclmask.longname"],        "primary": true,     "description": dict["zblclmask.description"] },
-    "blicw":         { "longname": dict["blicw.longname"],            "primary": false,    "description": dict["blicw.description"] }, // maybe get rid of this (DrJack does not know if it is useful because the formula used is so simple)
-    "blcwbase":      { "longname": dict["blcwbase.longname"],         "primary": false,    "description": dict["blcwbase.description"] },
-    "blcloudpct":    { "longname": dict["blcloudpct.longname"],       "primary": true,     "description": dict["blcloudpct.description"] },
-    "wrf=CFRACL":    { "longname": dict["wrf=CFRACL.longname"],       "primary": false,    "description": dict["wrf=CFRACL.description"] },
-    "wrf=CFRACM":    { "longname": dict["wrf=CFRACM.longname"],       "primary": false,    "description": dict["wrf=CFRACM.description"] },
-    "wrf=CFRACH":    { "longname": dict["wrf=CFRACH.longname"],       "primary": false,    "description": dict["wrf=CFRACH.description"] },
-    "rain1":         { "longname": dict["rain1.longname"],            "primary": true,     "description": dict["rain1.description"] },
-    "cape":          { "longname": dict["cape.longname"],             "primary": false,    "description": dict["cape.description"] },
+    "blicw":         { "longname": dict["blicw.longname"],            "primary": false,    "description": dict["blicw.description"], units: "", domain: [0, 20] }, // maybe get rid of this (DrJack does not know if it is useful because the formula used is so simple)
+    "blcwbase":      { "longname": dict["blcwbase.longname"],         "primary": false,    "description": dict["blcwbase.description"], units: "m", domain: [0, 3000] },
+    "blcloudpct":    { "longname": dict["blcloudpct.longname"],       "primary": true,     "description": dict["blcloudpct.description"], units: "", domain: [0, 1] },
+    "wrf=CFRACL":    { "longname": dict["wrf=CFRACL.longname"],       "primary": false,    "description": dict["wrf=CFRACL.description"], units: "", domain: [0, 1] },
+    "wrf=CFRACM":    { "longname": dict["wrf=CFRACM.longname"],       "primary": false,    "description": dict["wrf=CFRACM.description"], units: "", domain: [0, 1] },
+    "wrf=CFRACH":    { "longname": dict["wrf=CFRACH.longname"],       "primary": false,    "description": dict["wrf=CFRACH.description"], units: "", domain: [0, 1] },
+    "rain1":         { "longname": dict["rain1.longname"],            "primary": true,     "description": dict["rain1.description"], units: "mm", domain: [0, 10] },
+    "cape":          { "longname": dict["cape.longname"],             "primary": false,    "description": dict["cape.description"], units: "J/kg", domain: [0, 2000] },
     "press1000":     { "longname": dict["press1000.longname"],        "primary": false,    "description": dict["press1000.description"] },
     "press950":      { "longname": dict["press950.longname"],         "primary": false,    "description": dict["press950.description"] },
     "press850":      { "longname": dict["press850.longname"],         "primary": true,     "description": dict["press850.description"] },
     "press700":      { "longname": dict["press700.longname"],         "primary": false,    "description": dict["press700.description"] },
     "press500":      { "longname": dict["press500.longname"],         "primary": false,    "description": dict["press500.description"] },
-    "pfd_tot":       { "longname": dict["pfd_tot.longname"],          "primary": true,     "description": dict["pfd_tot.description"] },
+    "pfd_tot":       { "longname": dict["pfd_tot.longname"],          "primary": true,     "description": dict["pfd_tot.description"], units: "km", domain: [0, 1000] },
 };
 
 const cMultiParameters = {
@@ -144,45 +145,46 @@ const cMeteograms = {
     }
 };
 
-// The data is expected at <server>/<region> for day 0 and <server>/<region>+<day> for day > 0
-const cForecastServerRoot = "results/OUT";     // this points to the base location of all data
-
 // Define all static layers to be used in the map. Differentiate between mutually exclusive base layers ...
-const cBaseLayers = {
-    [dict["Topography"]]: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-	      attribution: 'Powered by <a href="https://www.esri.com" target="_blank">Esri</a> &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community',
-    }),
-    [dict["Grayscale"]]: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-	      attribution: 'Powered by <a href="https://www.esri.com" target="_blank">Esri</a> &mdash; Esri, DeLorme, NAVTEQ',
-    })
+const cLayers = {
+    baseLayers: {
+        [dict["Topography"]]: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Powered by <a href="https://www.esri.com" target="_blank">Esri</a> &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community',
+        }),
+        [dict["Grayscale"]]: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Powered by <a href="https://www.esri.com" target="_blank">Esri</a> &mdash; Esri, DeLorme, NAVTEQ',
+        })
+    },
+    // ... and overlays
+    overlays: {
+        [dict["Airspace"]]: L.tileLayer('https://{s}.tile.maps.openaip.net/geowebcache/service/tms/1.0.0/openaip_basemap@EPSG%3A900913@png/{z}/{x}/{y}.png', {
+            attribution: 'Airspace tiles by <a href="https://www.openaip.net" target="_blank">OpenAip</a>',
+            tms: true,
+            subdomains: '12',
+            transparent: true,
+            opacity: 0.5
+        })
+    },
 };
-// ... and overlays
-const cOverlays = {
-    [dict["Airspace"]]: L.tileLayer('https://{s}.tile.maps.openaip.net/geowebcache/service/tms/1.0.0/openaip_basemap@EPSG%3A900913@png/{z}/{x}/{y}.png', {
-        attribution: 'Airspace tiles by <a href="https://www.openaip.net" target="_blank">OpenAip</a>',
-        tms: true,
-        subdomains: '12',
-        transparent: true,
-        opacity: 0.5
-    })
+
+const cDefaults = {
+    // The data is expected at <server>/<region> for day 0 and <server>/<region>+<day> for day > 0
+    forecastServerRoot: "results/OUT",     // this points to the base location of all data
+    baseLayer: dict["Topography"],
+    overlays: [],
+    zoom: 7,
+    model: "TIR",                   // default model to start on
+    parameter: "wstar",             // which paramter to start on
+    parameterTime: "1300",          // which hour to start on
+    opacityLevel: 0.6,
+    opacityDelta: 0.1,
+    loadingAnimationDelay: 300, // ms. Wait this long before showing a loading animation for the to-be-shown overlay
+    zoomLocation: 'bottomleft',            // Zoom control position
+    scaleLocation: 'bottomleft',           // Scale position
+    RASPControlLocation: 'topleft',        // Position of custom RASP data control
+    soundingMarker: 'img/sounding.svg',
+    meteogramMarker: 'img/meteogram.svg',
+    markerSize: 15
 };
-// Now define which of those layers are chosen by default
-const cDefaultBaseLayer = dict["Topography"];
-const cDefaultOverlays = [];
 
-const cDefaultZoom = 7;
-const cDefaultOpacityLevel = 0.6;
-const cDefaultOpacityDelta = 0.1;
-const cLoadingAnimationDelay = 300; // ms. Wait this long before showing a loading animation for the to-be-shown overlay
-const cImageOverlayErrorImage = '';
-
-const cDefaultModel = "TIR";                   // default model to start on
-const cDefaultParameter = "wstar";     // which paramter to start on
-const cDefaultParameterTime = "1300";          // which hour to start on
-const cZoomLocation = 'bottomleft';            // Zoom control position
-const cScaleLocation = 'bottomleft';           // Scale position
-const cRASPControlLocation = 'topleft';        // Position of custom RASP data control
-
-const cSoundingMarker = 'img/sounding.svg';
-const cMeteogramMarker = 'img/meteogram.svg';
-const cMarkerSize = 15;
+export { cModels , cParameters , cMultiParameters , cSoundings , cMeteograms , cLayers , cDefaults };
