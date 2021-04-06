@@ -60,10 +60,43 @@ var gMap = L.map('map', {
 L.control.scale({position: cDefaults.scaleLocation}).addTo(gMap);
 L.control.zoom({position: cDefaults.zoomLocation}).addTo(gMap);
 
-var gPlot = {
-    init: function(map, sideScaleContainer, bottomScaleContainer) {
+L.Control.ValueIndicator = L.Control.extend({
+    options: {
+        raspData: null,
+        position: 'topleft',
+        emptyString: 'Unavailable',
+    },
+    onAdd: function (map) {
+        this._container = L.DomUtil.create('div', 'leaflet-control-valueindicator');
+        L.DomEvent.disableClickPropagation(this._container);
+        this._container.innerHTML = this.options.emptyString;
+        return this._container;
+    },
+    onRemove: function (map) {
+        // Nothing to do
+    },
+    update: function (text) {
+        this._container.innerHTML = text;
+    }
+});
+
+L.control.valueIndicator = function (options) {
+    return new L.Control.ValueIndicator(options);
+};
+
+L.RaspLayer = L.Layer.extend({
+    options: {
+        sideScaleContainerId: "sideScaleDiv",
+        bottomScaleContainerId: "bottomScaleDiv",
+    },
+    initialize: function(options) {
+        L.setOptions(this, options);
+    },
+    onAdd: function(map) {
         this._map = map;
 
+        // Color scales
+        var sideScaleContainer = document.getElementById(this.options.sideScaleContainerId);
         this.sideScaleUnits = L.DomUtil.create('div', 'scaleUnits', sideScaleContainer);
         this.sideScaleMax = L.DomUtil.create('div', 'scaleMax', sideScaleContainer);
         this.sideScaleCanvas = L.DomUtil.create('canvas', 'sideScaleCanvas', sideScaleContainer);
@@ -71,13 +104,15 @@ var gPlot = {
         this.sideScaleCanvas.width = 1;
         this.sideScaleMin = L.DomUtil.create('div', 'scaleMin', sideScaleContainer);
 
-        this.bottomScaleUnits = L.DomUtil.create('div', 'scaleUnits', bottomScaleContainer);
-        this.bottomScaleMax = L.DomUtil.create('div', 'scaleMax', bottomScaleContainer);
+        var bottomScaleContainer = document.getElementById(this.options.bottomScaleContainerId);
+        this.bottomScaleMin = L.DomUtil.create('div', 'scaleMin', bottomScaleContainer);
         this.bottomScaleCanvas = L.DomUtil.create('canvas', 'bottomScaleCanvas', bottomScaleContainer);
         this.bottomScaleCanvas.height = 1;
         this.bottomScaleCanvas.width = 256;
-        this.bottomScaleMin = L.DomUtil.create('div', 'scaleMin', bottomScaleContainer);
+        this.bottomScaleMax = L.DomUtil.create('div', 'scaleMax', bottomScaleContainer);
+        this.bottomScaleUnits = L.DomUtil.create('div', 'scaleUnits', bottomScaleContainer);
 
+        // Actual plot
         this._canvas = document.createElement('canvas');
         plotty.addColorScale("rasp", ["#004dff", "#01f8e9", "#34c00c", "#f8fd00", "#ff9b00", "#ff1400"], [0, 0.2, 0.4, 0.6, 0.8, 1]);
         plotty.addColorScale("clouds", ["#00000000", "#000000ff"], [0, 1]);
@@ -89,15 +124,29 @@ var gPlot = {
             noDataValue: -999999,
             colorScale: 'rasp'
         });
-        // Bounds get updated anyway
-        this.overlay = L.imageOverlay(this._canvas.toDataURL(), [[0,1], [0,1]]).addTo(this._map);
+        this.overlay = L.imageOverlay(this._canvas.toDataURL(), [[0,1], [0,1]]).addTo(this._map); // Bounds get updated anyway
+
+        // Value indicator
+        this.valueIndicator = L.control.valueIndicator();
+        this.valueIndicator.addTo(this._map);
+        this._map.on('mousemove', this._onMouseMove, this);
+        return this.valueIndicator;
+    },
+    onRemove: function() {
+        this._map.off('mousemove', this._onMouseMove);
     },
     update: function(georaster, parameter) {
+        this.georaster = georaster;
         let dataset = 0;
-        let data = new Float32Array(georaster.width * georaster.height);
-        for (let i = 0; i < georaster.height; i++) {
+        // It seems like the data has to be shifted down by 1 pixel, but I do not know why
+        // This is a plotting issue, as the data in georaster is definitely correct
+        var data = new Float32Array(georaster.width * georaster.height);
+        for (let i = 0; i < georaster.width; i++) {
+            data[i] = georaster.noDataValue;
+        }
+        for (let i = 1; i < georaster.height; i++) {
             for (let j = 0; j < georaster.width; j++) {
-                data[i * georaster.width + j] = georaster.values[0][i][j];
+                data[i * georaster.width + j] = georaster.values[0][i-1][j];
             }
         }
         if (this.plottyplot.datasetAvailable('dataset')) {
@@ -111,6 +160,7 @@ var gPlot = {
         this.plottyplot.render();
         this.overlay.setBounds([[georaster.ymin, georaster.xmin], [georaster.ymax, georaster.xmax]]);
         this.overlay.setUrl(this._canvas.toDataURL());
+        this._updateValueIndicator(this._lastLat, this._lastLng);
     },
     _updateColorscale: function(domain, units) {
         let colorScaleCanvas = this.plottyplot.colorScaleCanvas;
@@ -132,6 +182,7 @@ var gPlot = {
         this._updateScaleAnnotation(domain[0], domain[1], units);
     },
     _updateScaleAnnotation: function(min, max, units) {
+        this.units = units;
         this.sideScaleUnits.innerHTML = units;
         this.sideScaleMax.innerHTML = max;
         this.sideScaleMin.innerHTML = min;
@@ -145,9 +196,30 @@ var gPlot = {
     unquantize: function() {
         this.plottyplot.setExpression("");
     },
-};
+    _updateValueIndicator(lat, lng) {
+        this._lastLat = lat;
+        this._lastLng = lng;
+        var dataset = 0;
+        var bounds = this.overlay.getBounds();
+        var x = Math.floor((lng - bounds._southWest.lng) / (bounds._northEast.lng - bounds._southWest.lng) * this.plottyplot.currentDataset.width);
+        var y = Math.floor((bounds._northEast.lat - lat) / (bounds._northEast.lat - bounds._southWest.lat) * this.plottyplot.currentDataset.height);
+        var value = "-";
+        if (x >= 0 && x < this.georaster.width && y >= 0 && y < this.georaster.height) {
+            value = this.georaster.values[dataset][y][x].toFixed(0);
+            if (value == this.georaster.noDataValue) {
+                value = "-";
+            }
+        }
+        this.valueIndicator.update(`${value} ${this.units}`);
+    },
+    _onMouseMove: function(e) {
+        this._updateValueIndicator(e.latlng.lat, e.latlng.lng);
+    }
+});
 
-gPlot.init(gMap, document.getElementById("sideScaleDiv"), document.getElementById("bottomScaleDiv"));
+L.raspLayer = function(options) {
+    return new L.RaspLayer(options);
+};
 
 function getDataUrls(modelDir, parameter, time) {
     var baseUrl = cDefaults.forecastServerRoot + "/" + modelDir + "/" + parameter + ".";
@@ -183,6 +255,7 @@ L.Control.RASPControl = L.Control.extend({
         this._map = map;
         this._initTitle();
         this._initPanel();
+        this._initRaspLayer();
 
         this.opacityLevel = 0.7;
         this.opacityDelta = 0.1;
@@ -194,13 +267,13 @@ L.Control.RASPControl = L.Control.extend({
         return this._container;
     },
     _initTitle: function() {
-        this.title = document.getElementById("titleDiv");
-        this.title.parameter = L.DomUtil.create('h2', '', this.title);
-        this.title.validInfo = L.DomUtil.create('h3', '', this.title);
-        this.title.validSymbol1 = L.DomUtil.create('span', '', this.title.validInfo);
-        this.title.validText = L.DomUtil.create('span', '', this.title.validInfo);
-        this.title.validSymbol2 = L.DomUtil.create('span', '', this.title.validInfo);
-        this.title.drjack = L.DomUtil.create('h6', '', this.title);
+        this._raspTitle = document.getElementById("titleDiv");
+        this._raspTitle.parameter = L.DomUtil.create('h2', '', this._raspTitle);
+        this._raspTitle.validInfo = L.DomUtil.create('h3', '', this._raspTitle);
+        this._raspTitle.validSymbol1 = L.DomUtil.create('span', '', this._raspTitle.validInfo);
+        this._raspTitle.validText = L.DomUtil.create('span', '', this._raspTitle.validInfo);
+        this._raspTitle.validSymbol2 = L.DomUtil.create('span', '', this._raspTitle.validInfo);
+        this._raspTitle.drjack = L.DomUtil.create('h6', '', this._raspTitle);
     },
     _initPanel: function() {
         var className = "leaflet-control-layers";
@@ -223,9 +296,9 @@ L.Control.RASPControl = L.Control.extend({
         this.expand();
         L.DomEvent.disableClickPropagation(this._container);
         L.DomEvent.disableScrollPropagation(this._container);
-        this._rasp = L.DomUtil.create('div', "leaflet-control-layers-list", this._container);
+        this._raspPanel = L.DomUtil.create('div', "leaflet-control-layers-list", this._container);
 
-        var modelDayTimeParameterDiv = L.DomUtil.create('div', 'modelDayTimeParameterDiv', this._rasp);
+        var modelDayTimeParameterDiv = L.DomUtil.create('div', 'modelDayTimeParameterDiv', this._raspPanel);
         var modelDayTimeDiv = L.DomUtil.create('div', '', modelDayTimeParameterDiv);
         this.modelDaySelect = L.DomUtil.create('select', '', modelDayTimeDiv);
         this.modelDaySelect.onchange = () => { this.modelDayChange(); };
@@ -249,7 +322,7 @@ L.Control.RASPControl = L.Control.extend({
         parameterSummary.innerHTML = dict["parameterDetails_summary"];
         this.parameterDescription = L.DomUtil.create('span', 'parameterDescription', parameterDetails);
 
-        var opacityDiv = L.DomUtil.create('div', '', this._rasp);
+        var opacityDiv = L.DomUtil.create('div', '', this._raspPanel);
         var opacityDownButton = L.DomUtil.create('button', '', opacityDiv);
         opacityDownButton.onclick = () => { this.opacityDn(); };
         opacityDownButton.title = dict["opacityDecreaseButton_title"];
@@ -263,7 +336,7 @@ L.Control.RASPControl = L.Control.extend({
         opacityUpButton.title = dict["opacityIncreaseButton_title"];
         opacityUpButton.innerHTML = "+";
 
-        var markerDiv = L.DomUtil.create('div', 'markerDiv', this._rasp);
+        var markerDiv = L.DomUtil.create('div', 'markerDiv', this._raspPanel);
         var soundingLabel = L.DomUtil.create('label', '', markerDiv);
         soundingLabel.title = dict["soundingCheckbox_label"];
         this.soundingCheckbox = L.DomUtil.create('input', '', soundingLabel);
@@ -279,11 +352,15 @@ L.Control.RASPControl = L.Control.extend({
         var meteogramText = L.DomUtil.create('span', '', meteogramLabel);
         meteogramText.innerHTML = dict["Meteograms"];
 
-        this._collapseLink = L.DomUtil.create('a', 'leaflet-control-collapse-button', this._rasp);
+        this._collapseLink = L.DomUtil.create('a', 'leaflet-control-collapse-button', this._raspPanel);
         this._collapseLink.innerHTML = '⇱';
         this._collapseLink.title = 'Panel minimieren';
         this._collapseLink.href = '#collapse';
         L.DomEvent.on(this._collapseLink, 'click', this.collapse, this);
+    },
+    _initRaspLayer: function() {
+        this._raspLayer = L.raspLayer();
+        this._raspLayer.addTo(this._map);
     },
     onRemove: function(map) {
         // Nothing to do here
@@ -295,9 +372,6 @@ L.Control.RASPControl = L.Control.extend({
     collapse: function () {
         L.DomUtil.removeClass(this._container, 'leaflet-control-layers-expanded');
         return this;
-    },
-    bindToOverlay: function(overlay) {
-        this._overlay = overlay;
     },
     addModelDays: function() {
         const dayNames = [dict["Sunday"], dict["Monday"], dict["Tuesday"], dict["Wednesday"], dict["Thursday"], dict["Friday"], dict["Saturday"]];
@@ -350,7 +424,7 @@ L.Control.RASPControl = L.Control.extend({
         var {model, day} = this.getModelAndDay();
         this.addModelHours(model, day, this.timeSelect.value); // could have different hours
         this.addModelParameters(model); // could have different parameters
-        this.title.drjack.innerHTML = "DrJack BLIPMAP " + dict["from"] + " RASP " + dict["GFSA-initiated"] + " " + cModels[model].resolution + "km " + dict["WRF-ARW model"];
+        this._raspTitle.drjack.innerHTML = "DrJack BLIPMAP " + dict["from"] + " RASP " + dict["GFSA-initiated"] + " " + cModels[model].resolution + "km " + dict["WRF-ARW model"];
         this._map.setView(cModels[model].center, cModels[model].zoom); // recenter the map
         this.parameterChange();
     },
@@ -394,30 +468,30 @@ L.Control.RASPControl = L.Control.extend({
         this._updatePlot(urls.geotiffUrl, cParameters[parameter]);
     },
     _updateTitle: function(titleUrl, parameterLongname, day) {
-        this.title.parameter.innerHTML = parameterLongname;
+        this._raspTitle.parameter.innerHTML = parameterLongname;
         fetch(titleUrl)
             .then(response => {
                 return response.json();
             })
             .then(titleJson => {
-                this.title.validText.innerHTML = titleJson["validLocal"] + " (" + titleJson["validZulu"] + ") " + titleJson["validDate"] + " [" + titleJson["fcstTime"] + "]";
+                this._raspTitle.validText.innerHTML = titleJson["validLocal"] + " (" + titleJson["validZulu"] + ") " + titleJson["validDate"] + " [" + titleJson["fcstTime"] + "]";
                 var valid = isValid(titleJson["validDate"], day);
-                this.title.validSymbol1.innerHTML = valid ? "✅" : "❌";
-                this.title.validSymbol2.innerHTML = valid ? "✅" : "❌";
-                this.title.validInfo.title = valid ? dict["isValid"] : dict["isNotValid"];
+                this._raspTitle.validSymbol1.innerHTML = valid ? "✅" : "❌";
+                this._raspTitle.validSymbol2.innerHTML = valid ? "✅" : "❌";
+                this._raspTitle.validInfo.title = valid ? dict["isValid"] : dict["isNotValid"];
             })
             .catch(err => {
-                this.title.validText.innerHTML = dict["validityUnknown"];
-                this.title.validSymbol1.innerHTML = "⚠";
-                this.title.validSymbol2.innerHTML = "⚠";
-                this.title.validInfo.title = dict["isUnknownValid"];
+                this._raspTitle.validText.innerHTML = dict["validityUnknown"];
+                this._raspTitle.validSymbol1.innerHTML = "⚠";
+                this._raspTitle.validSymbol2.innerHTML = "⚠";
+                this._raspTitle.validInfo.title = dict["isUnknownValid"];
             });
     },
     _updatePlot: function(geotiffUrl, parameter) {
         fetch(geotiffUrl)
             .then(response => response.arrayBuffer())
             .then(parseGeoraster)
-            .then(georaster => this._overlay.update(georaster, parameter));
+            .then(georaster => this._raspLayer.update(georaster, parameter));
     },
     opacityUp: function() {
         this.opacityLevel = Math.min(this.opacityLevel + this.opacityDelta, 1);
@@ -428,7 +502,7 @@ L.Control.RASPControl = L.Control.extend({
         this.setOpacity();
     },
     setOpacity: function() {
-        this._overlay.overlay.setOpacity(this.opacityLevel);
+        this._raspLayer.overlay.setOpacity(this.opacityLevel);
     },
     getModelAndDay: function() {
         var resultSplit = this.modelDaySelect.value.split("+");
@@ -453,13 +527,12 @@ L.Control.RASPControl = L.Control.extend({
     }
 });
 
-L.control.raspControl = function(overlay, options) {
+L.control.raspControl = function(options) {
     var raspControl = new L.Control.RASPControl(options);
-    raspControl.bindToOverlay(overlay);
     return raspControl;
 };
 
-var gRaspControl = L.control.raspControl(gPlot, {position: cDefaults.RASPControlLocation}).addTo(gMap);
+var gRaspControl = L.control.raspControl({position: cDefaults.RASPControlLocation}).addTo(gMap);
 console.log(gRaspControl);
 
 // Leaflet needs this because the flexbox it is in does not evaluate to the right height at the beginning
