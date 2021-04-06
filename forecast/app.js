@@ -13,7 +13,6 @@ var gMeteogramIcon = L.icon({
     iconSize: [cDefaults.markerSize, cDefaults.markerSize]
 });
 
-
 // Compact attribution
 
 L.Control.Attribution.prototype._addTo = L.Control.Attribution.prototype.addTo;
@@ -62,9 +61,8 @@ L.control.zoom({position: cDefaults.zoomLocation}).addTo(gMap);
 
 L.Control.ValueIndicator = L.Control.extend({
     options: {
-        raspData: null,
         position: 'topleft',
-        emptyString: 'Unavailable',
+        emptyString: '-',
     },
     onAdd: function (map) {
         this._container = L.DomUtil.create('div', 'leaflet-control-valueindicator');
@@ -122,7 +120,7 @@ L.RaspLayer = L.Layer.extend({
             clampLow: true,
             clampHigh: true,
             noDataValue: -999999,
-            colorScale: 'rasp'
+            colorScale: 'rasp',
         });
         this.overlay = L.imageOverlay(this._canvas.toDataURL(), [[0,1], [0,1]]).addTo(this._map); // Bounds get updated anyway
 
@@ -137,30 +135,43 @@ L.RaspLayer = L.Layer.extend({
     },
     update: function(georaster, parameter) {
         this.georaster = georaster;
-        let dataset = 0;
+        this._updateDatasets(georaster);
+        this._plotDatasets(georaster, parameter);
+        this._updateValueIndicator(this._lastLat, this._lastLng);
+    },
+    _updateDatasets: function(georaster) {
         // It seems like the data has to be shifted down by 1 pixel, but I do not know why
-        // This is a plotting issue, as the data in georaster is definitely correct
-        var data = new Float32Array(georaster.width * georaster.height);
-        for (let i = 0; i < georaster.width; i++) {
-            data[i] = georaster.noDataValue;
-        }
-        for (let i = 1; i < georaster.height; i++) {
-            for (let j = 0; j < georaster.width; j++) {
-                data[i * georaster.width + j] = georaster.values[0][i-1][j];
+        // This is a plotting issue, the data in georaster is definitely correct (checked with QGIS)
+        let datasets = georaster.values.length;
+        this.data = new Array(datasets);
+        for (let d = 0; d < datasets; d++) {
+            this.data[d] = new Float32Array(georaster.width * georaster.height);
+            for (let i = 0; i < georaster.width; i++) {
+                this.data[d][i] = georaster.noDataValue;
+            }
+            for (let i = 1; i < georaster.height; i++) {
+                for (let j = 0; j < georaster.width; j++) {
+                    this.data[d][i * georaster.width + j] = georaster.values[d][i-1][j];
+                }
             }
         }
+    },
+    _plotDatasets: function(georaster, parameter) {
         if (this.plottyplot.datasetAvailable('dataset')) {
             this.plottyplot.removeDataset('dataset');
         }
-        this.plottyplot.addDataset('dataset', data, georaster.width, georaster.height);
+        this.plottyplot.addDataset('dataset', this.data[0], georaster.width, georaster.height);
         if (parameter.domain) {
             this.plottyplot.setDomain(parameter.domain);
+        }
+        this.plottyplot.setColorScale('rasp'); // Default
+        if (parameter.colorscale) {
+            this.plottyplot.setColorScale(parameter.colorscale);
         }
         this._updateColorscale(this.plottyplot.domain, parameter.units);
         this.plottyplot.render();
         this.overlay.setBounds([[georaster.ymin, georaster.xmin], [georaster.ymax, georaster.xmax]]);
         this.overlay.setUrl(this._canvas.toDataURL());
-        this._updateValueIndicator(this._lastLat, this._lastLng);
     },
     _updateColorscale: function(domain, units) {
         let colorScaleCanvas = this.plottyplot.colorScaleCanvas;
@@ -249,6 +260,20 @@ function getCyclicNextIndex(select) {
     }
     return index;
 }
+
+function makePopup(e, imageUrl, popupImage) {
+    var popupContent = document.createElement('div');
+    var popupLink = document.createElement("A");
+    popupLink.innerHTML = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 48 48'><path d='M38 38H10V10h14V6H10c-2.21 0-4 1.79-4 4v28c0 2.21 1.79 4 4 4h28c2.21 0 4-1.79 4-4V24h-4v14zM28 6v4h7.17L15.51 29.66l2.83 2.83L38 12.83V20h4V6H28z'/></svg>";
+    popupLink.href = imageUrl;
+    popupLink.title = dict["Show in separate window"];
+    popupLink.target = "_blank";
+    popupContent.appendChild(popupLink);
+    popupContent.appendChild(popupImage);
+    L.popup({maxWidth: "auto"}).setLatLng(e.target.getLatLng()).setContent(popupContent).openOn(gMap);
+    gImageOverlayLoadingAnimation.style.visibility = "hidden";
+}
+
 
 L.Control.RASPControl = L.Control.extend({
     onAdd: function(map) {
@@ -341,14 +366,14 @@ L.Control.RASPControl = L.Control.extend({
         soundingLabel.title = dict["soundingCheckbox_label"];
         this.soundingCheckbox = L.DomUtil.create('input', '', soundingLabel);
         this.soundingCheckbox.type = 'checkbox';
-        this.soundingCheckbox.onchange = () => { toggleSoundingsOrMeteograms(); };
+        this.soundingCheckbox.onchange = () => { this.toggleSoundingsOrMeteograms(); };
         var soundingText = L.DomUtil.create('span', '', soundingLabel);
         soundingText.innerHTML = dict["Soundings"];
         var meteogramLabel = L.DomUtil.create('label', '', markerDiv);
         meteogramLabel.title = dict["meteogramCheckbox_label"];
         this.meteogramCheckbox = L.DomUtil.create('input', '', meteogramLabel);
         this.meteogramCheckbox.type = 'checkbox';
-        this.meteogramCheckbox.onchange = () => { toggleSoundingsOrMeteograms(); };
+        this.meteogramCheckbox.onchange = () => { this.toggleSoundingsOrMeteograms(); };
         var meteogramText = L.DomUtil.create('span', '', meteogramLabel);
         meteogramText.innerHTML = dict["Meteograms"];
 
@@ -426,6 +451,8 @@ L.Control.RASPControl = L.Control.extend({
         this.addModelParameters(model); // could have different parameters
         this._raspTitle.drjack.innerHTML = "DrJack BLIPMAP " + dict["from"] + " RASP " + dict["GFSA-initiated"] + " " + cModels[model].resolution + "km " + dict["WRF-ARW model"];
         this._map.setView(cModels[model].center, cModels[model].zoom); // recenter the map
+        this.soundingOverlay = this.getSoundingMarkers(model);
+        this.meteogramOverlay = this.getMeteogramMarkers(model);
         this.parameterChange();
     },
     timeChange: function() {
@@ -524,6 +551,73 @@ L.Control.RASPControl = L.Control.extend({
     },
     disableOnMapClick: function() {
         this._map.off('click');
+    },
+    toggleSoundingsOrMeteograms: function() {
+        if (gRaspControl.soundingCheckbox.checked) {
+            this.soundingOverlay.addTo(gMap);
+        } else {
+            this.soundingOverlay.remove();
+        }
+        if (gRaspControl.meteogramCheckbox.checked) {
+            this.meteogramOverlay.addTo(gMap);
+        } else {
+            this.meteogramOverlay.remove();
+        }
+    },
+    getSoundingMarkers: function(modelKey) {
+        var markers = [];
+        var soundings = cSoundings[modelKey];
+        for (const soundingKey of Object.keys(soundings)) {
+            var sounding = soundings[soundingKey];
+            markers.push(
+                L.marker(sounding.location, {icon: gSoundingIcon})
+                    .bindTooltip(sounding.name)
+                    .on('click', e => {
+                        var modelDir = this.modelDaySelect.value;
+                        var time = this.timeSelect.value;
+                        var imageUrl = cDefaults.forecastServerRoot + "/" + modelDir + "/sounding" + soundingKey + ".curr." + time + "lst.d2.png";
+                        var popupImage = new Image();
+                        popupImage.setAttribute("class", "imagePopup");
+                        popupImage.onload = () => {
+                            makePopup(e, imageUrl, popupImage);
+                        };
+                        popupImage.src = imageUrl;
+                        setTimeout(() => {
+                            if (!popupImage.complete) {
+                                gImageOverlayLoadingAnimation.style.visibility = "visible";
+                            }
+                        }, cDefaults.loadingAnimationDelay);
+                    })
+            );
+        }
+        return L.layerGroup(markers);
+    },
+    getMeteogramMarkers: function(modelKey) {
+        var markers = [];
+        var meteograms = cMeteograms[modelKey];
+        for (const meteogramKey of Object.keys(meteograms)) {
+            var meteogram = meteograms[meteogramKey];
+            markers.push(
+                L.marker(meteogram.location, {icon: gMeteogramIcon})
+                    .bindTooltip(meteogram.name)
+                    .on('click', e => {
+                        var modelDir = this.modelDaySelect.value;
+                        var imageUrl = cDefaults.forecastServerRoot + "/" + modelDir + "/meteogram_" + meteogramKey + ".png";
+                        var popupImage = new Image();
+                        popupImage.setAttribute("class", "imagePopup");
+                        popupImage.onload = () => {
+                            makePopup(e, imageUrl, popupImage);
+                        };
+                        popupImage.src = imageUrl;
+                        setTimeout(() => {
+                            if (!popupImage.complete) {
+                                gImageOverlayLoadingAnimation.style.visibility = "visible";
+                            }
+                        }, cDefaults.loadingAnimationDelay);
+                    })
+            );
+        }
+        return L.layerGroup(markers);
     }
 });
 
@@ -560,108 +654,4 @@ var customLayerControl = L.Control.Layers.extend({
 });
 var gLayerControl = new customLayerControl(cLayers.baseLayers, cLayers.overlays).addTo(gMap);
 
-var gSoundingOverlay = getSoundingMarkers(cDefaults.model);
-var gMeteogramOverlay = getMeteogramMarkers(cDefaults.model);
-
 var gPopupPane = document.getElementsByClassName("leaflet-popup-pane")[0];
-
-// function onMapRightClick(e) {
-//     var latLng = L.latLng(e.latlng);
-//     var {model, day} = getModelAndDay();
-//     var parameter = gRaspControl.parameterSelect.value;
-//     var time = gRaspControl.timeSelect.value;
-//     var finalParameter = parameter;
-//     if (parameter in cMultiParameters) {
-//         finalParameter = cMultiParameters[parameter].join(' ');
-//     }
-//     var content = "<p><img src='app.php?region="+model+"&period="+day+"&lat="+latLng.lat+"&lon="+latLng.lng+"&time="+time+"&output=img&type="+finalParameter+"'>";
-//     var popup = L.popup({minWidth: 200})
-//         .setLatLng(latLng)
-//         .setContent(content)
-//         .openOn(gMap);
-// }
-
-// --- Soundings and meteograms ---
-
-function makePopup(e, imageUrl, popupImage) {
-    var popupContent = document.createElement('div');
-    var popupLink = document.createElement("A");
-    popupLink.innerHTML = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 48 48'><path d='M38 38H10V10h14V6H10c-2.21 0-4 1.79-4 4v28c0 2.21 1.79 4 4 4h28c2.21 0 4-1.79 4-4V24h-4v14zM28 6v4h7.17L15.51 29.66l2.83 2.83L38 12.83V20h4V6H28z'/></svg>";
-    popupLink.href = imageUrl;
-    popupLink.title = dict["Show in separate window"];
-    popupLink.target = "_blank";
-    popupContent.appendChild(popupLink);
-    popupContent.appendChild(popupImage);
-    L.popup({maxWidth: "auto"}).setLatLng(e.target.getLatLng()).setContent(popupContent).openOn(gMap);
-    gImageOverlayLoadingAnimation.style.visibility = "hidden";
-}
-
-function toggleSoundingsOrMeteograms() {
-    if (gRaspControl.soundingCheckbox.checked) {
-        gSoundingOverlay.addTo(gMap);
-    } else {
-        gSoundingOverlay.remove();
-    }
-    if (gRaspControl.meteogramCheckbox.checked) {
-        gMeteogramOverlay.addTo(gMap);
-    } else {
-        gMeteogramOverlay.remove();
-    }
-}
-
-function getSoundingMarkers(modelKey) {
-    var markers = [];
-    var soundings = cSoundings[modelKey];
-    for (const soundingKey of Object.keys(soundings)) {
-        var sounding = soundings[soundingKey];
-        markers.push(
-            L.marker(sounding.location, {icon: gSoundingIcon})
-                .bindTooltip(sounding.name)
-                .on('click', function(e) {
-                    var modelDir = gRaspControl.modelDaySelect.value;
-                    var time = gRaspControl.timeSelect.value;
-                    var imageUrl = cDefaults.forecastServerRoot + "/" + modelDir + "/sounding" + soundingKey + ".curr." + time + "lst.d2.png";
-                    var popupImage = new Image();
-                    popupImage.setAttribute("class", "imagePopup");
-                    popupImage.onload = () => {
-                        makePopup(e, imageUrl, popupImage);
-                    };
-                    popupImage.src = imageUrl;
-                    setTimeout(() => {
-                        if (!popupImage.complete) {
-                            gImageOverlayLoadingAnimation.style.visibility = "visible";
-                        }
-                    }, cDefaults.loadingAnimationDelay);
-                })
-        );
-    }
-    return L.layerGroup(markers);
-}
-
-function getMeteogramMarkers(modelKey) {
-    var markers = [];
-    var meteograms = cMeteograms[modelKey];
-    for (const meteogramKey of Object.keys(meteograms)) {
-        var meteogram = meteograms[meteogramKey];
-        markers.push(
-            L.marker(meteogram.location, {icon: gMeteogramIcon})
-                .bindTooltip(meteogram.name)
-                .on('click', function(e) {
-                    var modelDir = gRaspControl.modelDaySelect.value;
-                    var imageUrl = cDefaults.forecastServerRoot + "/" + modelDir + "/meteogram_" + meteogramKey + ".png";
-                    var popupImage = new Image();
-                    popupImage.setAttribute("class", "imagePopup");
-                    popupImage.onload = () => {
-                        makePopup(e, imageUrl, popupImage);
-                    };
-                    popupImage.src = imageUrl;
-                    setTimeout(() => {
-                        if (!popupImage.complete) {
-                            gImageOverlayLoadingAnimation.style.visibility = "visible";
-                        }
-                    }, cDefaults.loadingAnimationDelay);
-                })
-        );
-    }
-    return L.layerGroup(markers);
-}
