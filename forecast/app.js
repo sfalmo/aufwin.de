@@ -1,4 +1,4 @@
-import { cModels , cParameters , cMultiParameters , cSoundings , cMeteograms , cLayers , cDefaults } from './config.js';
+import { cModels , cParameters , cSoundings , cMeteograms , cLayers , cDefaults } from './config.js';
 
 // Divs for title and scales
 var gImageOverlayLoadingAnimation = document.getElementById("loadingDiv");
@@ -133,34 +133,39 @@ L.RaspLayer = L.Layer.extend({
     onRemove: function() {
         this._map.off('mousemove', this._onMouseMove);
     },
-    update: function(georaster, parameter) {
-        this.georaster = georaster;
-        this._updateDatasets(georaster);
-        this._plotDatasets(georaster, parameter);
+    update: function(georasters, parameter) {
+        this.georasters = georasters;
+        if (parameter.composite) {
+            this.units = parameter.composite.units;
+        } else {
+            this.units = parameter.units;
+        }
+        this._updateDatasets(georasters);
+        this._plotBase(georasters, parameter);
         this._updateValueIndicator(this._lastLat, this._lastLng);
     },
-    _updateDatasets: function(georaster) {
+    _updateDatasets: function(georasters) {
         // It seems like the data has to be shifted down by 1 pixel, but I do not know why
         // This is a plotting issue, the data in georaster is definitely correct (checked with QGIS)
-        let datasets = georaster.values.length;
-        this.data = new Array(datasets);
-        for (let d = 0; d < datasets; d++) {
-            this.data[d] = new Float32Array(georaster.width * georaster.height);
-            for (let i = 0; i < georaster.width; i++) {
-                this.data[d][i] = georaster.noDataValue;
+        let layers = georasters.length;
+        this.data = new Array(layers);
+        for (let d = 0; d < layers; d++) {
+            this.data[d] = new Float32Array(georasters[d].width * georasters[d].height);
+            for (let i = 0; i < georasters[d].width; i++) {
+                this.data[d][i] = georasters[d].noDataValue;
             }
-            for (let i = 1; i < georaster.height; i++) {
-                for (let j = 0; j < georaster.width; j++) {
-                    this.data[d][i * georaster.width + j] = georaster.values[d][i-1][j];
+            for (let i = 1; i < georasters[d].height; i++) {
+                for (let j = 0; j < georasters[d].width; j++) {
+                    this.data[d][i * georasters[d].width + j] = georasters[d].values[0][i-1][j];
                 }
             }
         }
     },
-    _plotDatasets: function(georaster, parameter) {
+    _plotBase: function(georasters, parameter) {
         if (this.plottyplot.datasetAvailable('dataset')) {
             this.plottyplot.removeDataset('dataset');
         }
-        this.plottyplot.addDataset('dataset', this.data[0], georaster.width, georaster.height);
+        this.plottyplot.addDataset('dataset', this.data[0], georasters[0].width, georasters[0].height);
         if (parameter.domain) {
             this.plottyplot.setDomain(parameter.domain);
         }
@@ -170,7 +175,7 @@ L.RaspLayer = L.Layer.extend({
         }
         this._updateColorscale(this.plottyplot.domain, parameter.units);
         this.plottyplot.render();
-        this.overlay.setBounds([[georaster.ymin, georaster.xmin], [georaster.ymax, georaster.xmax]]);
+        this.overlay.setBounds([[georasters[0].ymin, georasters[0].xmin], [georasters[0].ymax, georasters[0].xmax]]);
         this.overlay.setUrl(this._canvas.toDataURL());
     },
     _updateColorscale: function(domain, units) {
@@ -190,14 +195,13 @@ L.RaspLayer = L.Layer.extend({
             sideScaleData.data[i+3] = colorScaleData.data[r+3];
         }
         sideScaleCtx.putImageData(sideScaleData, 0, 0);
-        this._updateScaleAnnotation(domain[0], domain[1], units);
+        this._updateScaleAnnotation(domain[0], domain[1], typeof this.units == 'string' ? this.units : this.units[0]);
     },
-    _updateScaleAnnotation: function(min, max, units) {
-        this.units = units;
-        this.sideScaleUnits.innerHTML = units;
+    _updateScaleAnnotation: function(min, max, scaleUnits) {
+        this.sideScaleUnits.innerHTML = scaleUnits;
         this.sideScaleMax.innerHTML = max;
         this.sideScaleMin.innerHTML = min;
-        this.bottomScaleUnits.innerHTML = units;
+        this.bottomScaleUnits.innerHTML = scaleUnits;
         this.bottomScaleMax.innerHTML = max;
         this.bottomScaleMin.innerHTML = min;
     },
@@ -210,18 +214,26 @@ L.RaspLayer = L.Layer.extend({
     _updateValueIndicator(lat, lng) {
         this._lastLat = lat;
         this._lastLng = lng;
-        var dataset = 0;
         var bounds = this.overlay.getBounds();
         var x = Math.floor((lng - bounds._southWest.lng) / (bounds._northEast.lng - bounds._southWest.lng) * this.plottyplot.currentDataset.width);
         var y = Math.floor((bounds._northEast.lat - lat) / (bounds._northEast.lat - bounds._southWest.lat) * this.plottyplot.currentDataset.height);
-        var value = "-";
-        if (x >= 0 && x < this.georaster.width && y >= 0 && y < this.georaster.height) {
-            value = this.georaster.values[dataset][y][x].toFixed(0);
-            if (value == this.georaster.noDataValue) {
-                value = "-";
+        var valueIndicatorText = "-";
+        if (x >= 0 && x < this.georasters[0].width && y >= 0 && y < this.georasters[0].height) {
+            valueIndicatorText = "";
+            for (let i = 0; i < this.georasters.length; i++) {
+                var value = this.georasters[i].values[0][y][x].toFixed(0);
+                if (value == this.georasters[i].noDataValue) {
+                    value = "-";
+                }
+                var valueText = value;
+                var unitText = typeof this.units == 'string' ? this.units : this.units[i];
+                if (i > 0) {
+                    valueIndicatorText += ", ";
+                }
+                valueIndicatorText += `${valueText} ${unitText}`;
             }
         }
-        this.valueIndicator.update(`${value} ${this.units}`);
+        this.valueIndicator.update(valueIndicatorText);
     },
     _onMouseMove: function(e) {
         this._updateValueIndicator(e.latlng.lat, e.latlng.lng);
@@ -232,15 +244,17 @@ L.raspLayer = function(options) {
     return new L.RaspLayer(options);
 };
 
-function getDataUrls(modelDir, parameter, time) {
-    var baseUrl = cDefaults.forecastServerRoot + "/" + modelDir + "/" + parameter + ".";
-    var titleParameter = cMultiParameters[parameter] ? cMultiParameters[parameter][0] : parameter;
-    var titleBaseUrl = cDefaults.forecastServerRoot + "/" + modelDir + "/" + titleParameter + ".";
-    if (parameter != "pfd_tot") { // Almost all parameters are time-dependent, PFD being the exception
-        baseUrl += "curr."+time+"lst.d2.";
-        titleBaseUrl += "curr."+time+"lst.d2.";
+function getDataUrls(modelDir, parameterKey, time) {
+    var baseUrls = [cDefaults.forecastServerRoot + "/" + modelDir + "/" + parameterKey + "."]; // Default (no composite parameter)
+    if (cParameters[parameterKey].composite) {
+        baseUrls = cParameters[parameterKey].composite.of.map(key => cDefaults.forecastServerRoot + "/" + modelDir + "/" + key + ".");
     }
-    return {geotiffUrl: baseUrl + "data.tiff", titleUrl: titleBaseUrl + "title.json"};
+    if (parameterKey != "pfd_tot") { // Almost all parameters are time-dependent, PFD being the exception
+        baseUrls = baseUrls.map(base => base + "curr."+time+"lst.d2.");
+    }
+    var geotiffUrls = baseUrls.map(base => base + "data.tiff");
+    var titleUrl = baseUrls[0] + "title.json";
+    return {geotiffUrls: geotiffUrls, titleUrl: titleUrl};
 }
 
 function isValid(dateText, day) {
@@ -482,17 +496,18 @@ L.Control.RASPControl = L.Control.extend({
         var modelDir = this.modelDaySelect.value;
         var {model, day} = this.getModelAndDay();
         var time = this.timeSelect.value;
-        var parameter = this.parameterSelect.value;
-        if (parameter == "pfd_tot") {
+        var parameterKey = this.parameterSelect.value;
+        if (parameterKey == "pfd_tot") {
             this.timeSelect.disabled = true;
             this.disableOnMapClick();
         } else {
             this.timeSelect.disabled = false;
             this.enableOnMapClick();
         }
-        var urls = getDataUrls(modelDir, parameter, time);
-        this._updateTitle(urls.titleUrl, cParameters[parameter].longname, day);
-        this._updatePlot(urls.geotiffUrl, cParameters[parameter]);
+        var parameter = cParameters[parameterKey];
+        var urls = getDataUrls(modelDir, parameterKey, time);
+        this._updateTitle(urls.titleUrl, parameter.longname, day);
+        this._updatePlot(urls.geotiffUrls, parameter);
     },
     _updateTitle: function(titleUrl, parameterLongname, day) {
         this._raspTitle.parameter.innerHTML = parameterLongname;
@@ -514,11 +529,15 @@ L.Control.RASPControl = L.Control.extend({
                 this._raspTitle.validInfo.title = dict["isUnknownValid"];
             });
     },
-    _updatePlot: function(geotiffUrl, parameter) {
-        fetch(geotiffUrl)
-            .then(response => response.arrayBuffer())
-            .then(parseGeoraster)
-            .then(georaster => this._raspLayer.update(georaster, parameter));
+    _updatePlot: function(geotiffUrls, parameter) {
+        Promise.all(geotiffUrls.map(url => fetch(url)))
+            .then(responses => {
+                return Promise.all(responses.map(response => response.arrayBuffer()));
+            })
+            .then(buffers => {
+                return Promise.all(buffers.map(parseGeoraster));
+            })
+            .then(georasters => this._raspLayer.update(georasters, parameter));
     },
     opacityUp: function() {
         this.opacityLevel = Math.min(this.opacityLevel + this.opacityDelta, 1);

@@ -57,11 +57,13 @@ const cModels = {
     }
 };
 
-// Key is taken from RASP. Longname and description self explanatory. Primary: appears in short parameter list. Domain: default range of scale
+// Key is taken from RASP. Longname and description self explanatory. Primary: appears in short parameter list. Domain: default range of scale, Composite if multiparameter
 const cParameters = {
     "wstar":         { "longname": dict["wstar.longname"],         "primary": true,     "description": dict["wstar.description"], units: "cm/s", domain: [0, 500] },
-    "bsratio":       { "longname": dict["bsratio.longname"],       "primary": false,    "description": dict["bsratio.description"], units: "", domain: [0, 10] },
-    "wstar_bsratio": { "longname": dict["wstar_bsratio.longname"], "primary": true,     "description": dict["wstar_bsratio.description"] },
+    "bsratio":       { "longname": dict["bsratio.longname"],       "primary": false,    "description": dict["bsratio.description"], units: " ", domain: [0, 10] },
+    "wstar_bsratio": { "longname": dict["wstar_bsratio.longname"], "primary": true,     "description": dict["wstar_bsratio.description"],
+                       composite: { of: ["wstar", "bsratio"], units: ["cm/s", " "], type: "wstar_bsratio" }
+                     },
     "hglider":       { "longname": dict["hglider.longname"],       "primary": true,     "description": dict["hglider.description"], units: "m", domain: [0, 3000] },
     "hwcrit":        { "longname": dict["hwcrit.longname"],        "primary": true,     "description": dict["hwcrit.description"], units: "m", domain: [0, 3000] },
     "dwcrit":        { "longname": dict["dwcrit.longname"],        "primary": false,    "description": dict["dwcrit.description"], units: "m", domain: [0, 3000] },
@@ -70,49 +72,54 @@ const cParameters = {
     "bltopvariab":   { "longname": dict["bltopvariab.longname"],   "primary": false,    "description": dict["bltopvariab.description"], units: "m", domain: [0, 1000] },
     "wblmaxmin":     { "longname": dict["wblmaxmin.longname"],     "primary": false,    "description": dict["wblmaxmin.description"], units: "cm/s", domain: [-250, 250] },
     "zwblmaxmin":    { "longname": dict["zwblmaxmin.longname"],    "primary": false,    "description": dict["zwblmaxmin.description"], units: "m", domain: [0, 3000] },
-    "sfcsunpct":     { "longname": dict["sfcsunpct.longname"],     "primary": true,     "description": dict["sfcsunpct.description"], units: "", domain: [0, 100] },
+    "sfcsunpct":     { "longname": dict["sfcsunpct.longname"],     "primary": true,     "description": dict["sfcsunpct.description"], units: "%", domain: [0, 100] },
     "sfcshf":        { "longname": dict["sfcshf.longname"],        "primary": false,    "description": dict["sfcshf.description"], units: "W/m²", domain: [-50, 300] },
     "sfctemp":       { "longname": dict["sfctemp.longname"],       "primary": true,     "description": dict["sfctemp.description"], units: "°C", domain: [-10, 40] },
     "sfcdewpt":      { "longname": dict["sfcdewpt.longname"],      "primary": true,     "description": dict["sfcdewpt.description"], units: "°C", domain: [-10, 40] },
     "mslpress":      { "longname": dict["mslpress.longname"],      "primary": false,    "description": dict["mslpress.description"], units: "hPa" },
-    "sfcwind0":      { "longname": dict["sfcwind0.longname"],      "primary": true,     "description": dict["sfcwind0.description"] },
-    "sfcwind":       { "longname": dict["sfcwind.longname"],       "primary": false,    "description": dict["sfcwind.description"] },
-    "blwind":        { "longname": dict["blwind.longname"],        "primary": true,     "description": dict["blwind.description"] },
-    "bltopwind":     { "longname": dict["bltopwind.longname"],     "primary": false,    "description": dict["bltopwind.description"] },
-    "blwindshear":   { "longname": dict["blwindshear.longname"],   "primary": false,    "description": dict["blwindshear.description"] },
+    "sfcwind0":      { "longname": dict["sfcwind0.longname"],      "primary": true,     "description": dict["sfcwind0.description"],
+                       composite:{ of: ["sfcwind0spd", "sfcwind0dir"], units: ["m/s", "°"], type: "wind" }
+                     },
+    "sfcwind":       { "longname": dict["sfcwind.longname"],       "primary": false,    "description": dict["sfcwind.description"],
+                       composite: { of: ["sfcwindspd", "sfcwinddir"], units: ["m/s", "°"], type: "wind" }
+                     },
+    "blwind":        { "longname": dict["blwind.longname"],        "primary": true,     "description": dict["blwind.description"],
+                       composite: { of: ["blwindspd", "blwinddir"], units: ["m/s", "°"], type: "wind" }
+                     },
+    "bltopwind":     { "longname": dict["bltopwind.longname"],     "primary": false,    "description": dict["bltopwind.description"],
+                       composite: { of: ["bltopwindspd", "bltopwinddir"], units: ["m/s", "°"], type: "wind" }
+                     },
+    "blwindshear":   { "longname": dict["blwindshear.longname"],   "primary": false,    "description": dict["blwindshear.description"], units: "cm/s", domain: [0, 100] },
     "zsfclcldif":    { "longname": dict["zsfclcldif.longname"],    "primary": false,    "description": dict["zsfclcldif.description"], units: "m", domain: [-1000, 1000] },
     "zsfclcl":       { "longname": dict["zsfclcl.longname"],       "primary": false,    "description": dict["zsfclcl.description"], units: "m", domain: [0, 3000] },
     "zsfclclmask":   { "longname": dict["zsfclclmask.longname"],   "primary": true,     "description": dict["zsfclclmask.description"], units: "m", domain: [0, 3000] },
     "zblcldif":      { "longname": dict["zblcldif.longname"],      "primary": false,    "description": dict["zblcldif.description"], units: "m", domain: [-1000, 1000] },
     "zblcl":         { "longname": dict["zblcl.longname"],         "primary": false,    "description": dict["zblcl.description"], units: "m", domain: [0, 3000] },
     "zblclmask":     { "longname": dict["zblclmask.longname"],     "primary": true,     "description": dict["zblclmask.description"], units: "m", domain: [0, 3000] },
-    "blicw":         { "longname": dict["blicw.longname"],         "primary": false,    "description": dict["blicw.description"], units: "", domain: [0, 20] }, // maybe get rid of this (DrJack does not know if it is useful because the formula used is so simple)
+    "blicw":         { "longname": dict["blicw.longname"],         "primary": false,    "description": dict["blicw.description"], units: " ", domain: [0, 20] }, // maybe get rid of this (DrJack does not know if it is useful because the formula used is so simple)
     "blcwbase":      { "longname": dict["blcwbase.longname"],      "primary": false,    "description": dict["blcwbase.description"], units: "m", domain: [0, 3000] },
     "blcloudpct":    { "longname": dict["blcloudpct.longname"],    "primary": true,     "description": dict["blcloudpct.description"], units: "%", domain: [0, 100], colorscale: "clouds" },
     "wrf=CFRACL":    { "longname": dict["wrf=CFRACL.longname"],    "primary": false,    "description": dict["wrf=CFRACL.description"], units: "", domain: [0, 1], colorscale: "clouds" },
     "wrf=CFRACM":    { "longname": dict["wrf=CFRACM.longname"],    "primary": false,    "description": dict["wrf=CFRACM.description"], units: "", domain: [0, 1], colorscale: "clouds" },
     "wrf=CFRACH":    { "longname": dict["wrf=CFRACH.longname"],    "primary": false,    "description": dict["wrf=CFRACH.description"], units: "", domain: [0, 1], colorscale: "clouds" },
+    "clouds":        { "longname": dict["clouds.longname"],        "primary": false,    "description": dict["clouds.description"],
+                       composite: { of: ["bltopwindspd", "bltopwinddir"], units: ["m/s", "°"], type: "clouds" }
+                     },
     "rain1":         { "longname": dict["rain1.longname"],         "primary": true,     "description": dict["rain1.description"], units: "mm/h", domain: [0, 10] },
     "cape":          { "longname": dict["cape.longname"],          "primary": false,    "description": dict["cape.description"], units: "J/kg", domain: [0, 2000] },
-    "press1000":     { "longname": dict["press1000.longname"],     "primary": false,    "description": dict["press1000.description"] },
-    "press950":      { "longname": dict["press950.longname"],      "primary": false,    "description": dict["press950.description"] },
-    "press850":      { "longname": dict["press850.longname"],      "primary": true,     "description": dict["press850.description"] },
-    "press700":      { "longname": dict["press700.longname"],      "primary": false,    "description": dict["press700.description"] },
-    "press500":      { "longname": dict["press500.longname"],      "primary": false,    "description": dict["press500.description"] },
+    "press950":      { "longname": dict["press950.longname"],      "primary": false,    "description": dict["press950.description"],
+                       composite: { of: ["press950", "press950wspd", "press950wdir"], units: ["m/s", "°"], type: "press" }
+                     },
+    "press850":      { "longname": dict["press850.longname"],      "primary": true,     "description": dict["press850.description"],
+                       composite: { of: ["press850", "press850wspd", "press850wdir"], units: ["m/s", "°"], type: "press" }
+                     },
+    "press700":      { "longname": dict["press700.longname"],      "primary": false,    "description": dict["press700.description"],
+                       composite: { of: ["press700", "press700wspd", "press700wdir"], units: ["m/s", "°"], type: "press" }
+                     },
+    "press500":      { "longname": dict["press500.longname"],      "primary": false,    "description": dict["press500.description"],
+                       composite: { of: ["press500", "press500wspd", "press500wdir"], units: ["m/s", "°"], type: "press" }
+                     },
     "pfd_tot":       { "longname": dict["pfd_tot.longname"],       "primary": true,     "description": dict["pfd_tot.description"], units: "km", domain: [0, 1000] },
-};
-
-const cMultiParameters = {
-    "wstar_bsratio": ["wstar", "bsratio"],
-    "sfcwind0":      ["sfcwind0spd", "sfcwind0dir"],
-    "sfcwind":       ["sfcwindspd", "sfcwinddir"],
-    "blwind":        ["blwindspd", "blwinddir"],
-    "bltopwind":     ["bltopwindspd", "bltopwinddir"],
-    "press1000":     ["press1000", "press1000wspd", "press1000wdir"],
-    "press950":      ["press950", "press950wspd", "press950wdir"],
-    "press850":      ["press850", "press850wspd", "press850wdir"],
-    "press700":      ["press700", "press700wspd", "press700wdir"],
-    "press500":      ["press500", "press500wspd", "press500wdir"],
 };
 
 const cSoundings = {
@@ -187,4 +194,4 @@ const cDefaults = {
     markerSize: 15
 };
 
-export { cModels , cParameters , cMultiParameters , cSoundings , cMeteograms , cLayers , cDefaults };
+export { cModels , cParameters , cSoundings , cMeteograms , cLayers , cDefaults };
