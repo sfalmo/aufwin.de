@@ -82,16 +82,24 @@ L.control.valueIndicator = function (options) {
     return new L.Control.ValueIndicator(options);
 };
 
-L.RaspLayer = L.Layer.extend({
+
+L.RaspRenderer = L.Class.extend({
+    initialize: function(canvas, options) {
+        this.canvas = canvas;
+        L.setOptions(this, options);
+    },
+    render: function(georaster) {
+        throw new Error("Abstract class");
+    }
+});
+
+L.RaspRenderer.Plotty = L.RaspRenderer.extend({
     options: {
         sideScaleContainerId: "sideScaleDiv",
         bottomScaleContainerId: "bottomScaleDiv",
     },
-    initialize: function(options) {
-        L.setOptions(this, options);
-    },
-    onAdd: function(map) {
-        this._map = map;
+    initialize: function(canvas, options) {
+        this.canvas = canvas;
 
         // Color scales
         var sideScaleContainer = document.getElementById(this.options.sideScaleContainerId);
@@ -110,19 +118,86 @@ L.RaspLayer = L.Layer.extend({
         this.bottomScaleMax = L.DomUtil.create('div', 'scaleMax', bottomScaleContainer);
         this.bottomScaleUnits = L.DomUtil.create('div', 'scaleUnits', bottomScaleContainer);
 
-        // Actual plot
-        this._canvas = document.createElement('canvas');
         plotty.addColorScale("rasp", ["#004dff", "#01f8e9", "#34c00c", "#f8fd00", "#ff9b00", "#ff1400"], [0, 0.2, 0.4, 0.6, 0.8, 1]);
         plotty.addColorScale("clouds", ["#00000000", "#000000ff"], [0, 1]);
         this.plottyplot = new plotty.plot({
-            canvas: this._canvas,
+            canvas: this.canvas,
             domain: [0, 1],
             clampLow: true,
             clampHigh: true,
             noDataValue: -999999,
             colorScale: 'rasp',
         });
-        this.overlay = L.imageOverlay(this._canvas.toDataURL(), [[0,1], [0,1]]).addTo(this._map); // Bounds get updated anyway
+    },
+    render: function(data, georaster, parameter) {
+        if (this.plottyplot.datasetAvailable('dataset')) {
+            this.plottyplot.removeDataset('dataset');
+        }
+        this.plottyplot.addDataset('dataset', data, georaster.width, georaster.height);
+        this.plottyplot.setDomain(parameter.domain);
+        this.plottyplot.setColorScale(parameter.colorscale ? parameter.colorscale : 'rasp'); // Default to rasp
+        this._updateColorscale(parameter.domain, parameter.units);
+        this.plottyplot.render();
+    },
+    _updateScale: function(domain, units) {
+        this._updateColorscale(domain, units);
+        this._updateScaleAnnotation(domain[0], domain[1], typeof this.units == 'string' ? this.units : this.units[0]);
+    },
+    _updateColorscale: function(domain, units) {
+        let colorScaleCanvas = this.plottyplot.colorScaleCanvas;
+        let colorScaleCtx = colorScaleCanvas.getContext('2d');
+        let colorScaleData = colorScaleCtx.getImageData(0, 0, colorScaleCanvas.width, colorScaleCanvas.height);
+        let bottomScaleCtx = this.bottomScaleCanvas.getContext('2d');
+        bottomScaleCtx.putImageData(colorScaleData, 0, 0);
+        // The color scale data has to be flipped for rendering it vertically in the side scale
+        let sideScaleCtx = this.sideScaleCanvas.getContext('2d');
+        let sideScaleData = sideScaleCtx.createImageData(colorScaleCanvas.height, colorScaleCanvas.width);
+        for (let i = 0; i < colorScaleData.data.length; i+=4) {
+            let r = colorScaleData.data.length - 4 - i;
+            sideScaleData.data[i] = colorScaleData.data[r];
+            sideScaleData.data[i+1] = colorScaleData.data[r+1];
+            sideScaleData.data[i+2] = colorScaleData.data[r+2];
+            sideScaleData.data[i+3] = colorScaleData.data[r+3];
+        }
+        sideScaleCtx.putImageData(sideScaleData, 0, 0);
+    },
+    _updateScaleAnnotation: function(min, max, scaleUnits) {
+        this.sideScaleUnits.innerHTML = scaleUnits;
+        this.sideScaleMax.innerHTML = max;
+        this.sideScaleMin.innerHTML = min;
+        this.bottomScaleUnits.innerHTML = scaleUnits;
+        this.bottomScaleMax.innerHTML = max;
+        this.bottomScaleMin.innerHTML = min;
+    },
+    quantize: function(value) {
+        this.plottyplot.setExpression(`floor(dataset / ${value} + 0.5) * ${value}`);
+    },
+    unquantize: function() {
+        this.plottyplot.setExpression("");
+    }
+});
+
+L.raspRenderer = function(canvas, options) {
+    return new L.RaspRenderer(canvas, options);
+};
+
+L.raspRenderer.plotty = function(canvas, options) {
+    return new L.RaspRenderer.Plotty(canvas, options);
+}
+
+L.RaspLayer = L.Layer.extend({
+    initialize: function(options) {
+        L.setOptions(this, options);
+    },
+    onAdd: function(map) {
+        this._map = map;
+
+        // Initialize canvas
+        this.canvas = document.createElement('canvas');
+        this.overlay = L.imageOverlay(this.canvas.toDataURL(), [[0,1], [0,1]]).addTo(this._map); // Bounds get updated anyway
+
+        // Renderers
+        this.plottyRenderer = L.raspRenderer.plotty(this.canvas);
 
         // Value indicator
         this.valueIndicator = L.control.valueIndicator();
@@ -141,7 +216,7 @@ L.RaspLayer = L.Layer.extend({
             this.units = parameter.units;
         }
         this._updateDatasets(georasters);
-        this._plotBase(georasters, parameter);
+        this._plot(georasters, parameter);
         this._updateValueIndicator(this._lastLat, this._lastLng);
     },
     _updateDatasets: function(georasters) {
@@ -161,62 +236,20 @@ L.RaspLayer = L.Layer.extend({
             }
         }
     },
-    _plotBase: function(georasters, parameter) {
-        if (this.plottyplot.datasetAvailable('dataset')) {
-            this.plottyplot.removeDataset('dataset');
-        }
-        this.plottyplot.addDataset('dataset', this.data[0], georasters[0].width, georasters[0].height);
-        if (parameter.domain) {
-            this.plottyplot.setDomain(parameter.domain);
-        }
-        this.plottyplot.setColorScale('rasp'); // Default
-        if (parameter.colorscale) {
-            this.plottyplot.setColorScale(parameter.colorscale);
-        }
-        this._updateColorscale(this.plottyplot.domain, parameter.units);
-        this.plottyplot.render();
+    _plot: function(georasters, parameter) {
         this.overlay.setBounds([[georasters[0].ymin, georasters[0].xmin], [georasters[0].ymax, georasters[0].xmax]]);
-        this.overlay.setUrl(this._canvas.toDataURL());
-    },
-    _updateColorscale: function(domain, units) {
-        let colorScaleCanvas = this.plottyplot.colorScaleCanvas;
-        let colorScaleCtx = colorScaleCanvas.getContext('2d');
-        let colorScaleData = colorScaleCtx.getImageData(0, 0, colorScaleCanvas.width, colorScaleCanvas.height);
-        let bottomScaleCtx = this.bottomScaleCanvas.getContext('2d');
-        bottomScaleCtx.putImageData(colorScaleData, 0, 0);
-        // The color scale data has to be flipped for rendering it vertically in the side scale
-        let sideScaleCtx = this.sideScaleCanvas.getContext('2d');
-        let sideScaleData = sideScaleCtx.createImageData(colorScaleCanvas.height, colorScaleCanvas.width);
-        for (let i = 0; i < colorScaleData.data.length; i+=4) {
-            let r = colorScaleData.data.length - 4 - i;
-            sideScaleData.data[i] = colorScaleData.data[r];
-            sideScaleData.data[i+1] = colorScaleData.data[r+1];
-            sideScaleData.data[i+2] = colorScaleData.data[r+2];
-            sideScaleData.data[i+3] = colorScaleData.data[r+3];
+        this.plottyRenderer.render(this.data[0], georasters[0], parameter);
+        if (parameter.composite) {
+            // TODO
         }
-        sideScaleCtx.putImageData(sideScaleData, 0, 0);
-        this._updateScaleAnnotation(domain[0], domain[1], typeof this.units == 'string' ? this.units : this.units[0]);
-    },
-    _updateScaleAnnotation: function(min, max, scaleUnits) {
-        this.sideScaleUnits.innerHTML = scaleUnits;
-        this.sideScaleMax.innerHTML = max;
-        this.sideScaleMin.innerHTML = min;
-        this.bottomScaleUnits.innerHTML = scaleUnits;
-        this.bottomScaleMax.innerHTML = max;
-        this.bottomScaleMin.innerHTML = min;
-    },
-    quantize: function(value) {
-        this.plottyplot.setExpression(`floor(dataset / ${value} + 0.5) * ${value}`);
-    },
-    unquantize: function() {
-        this.plottyplot.setExpression("");
+        this.overlay.setUrl(this.canvas.toDataURL());
     },
     _updateValueIndicator(lat, lng) {
         this._lastLat = lat;
         this._lastLng = lng;
         var bounds = this.overlay.getBounds();
-        var x = Math.floor((lng - bounds._southWest.lng) / (bounds._northEast.lng - bounds._southWest.lng) * this.plottyplot.currentDataset.width);
-        var y = Math.floor((bounds._northEast.lat - lat) / (bounds._northEast.lat - bounds._southWest.lat) * this.plottyplot.currentDataset.height);
+        var x = Math.floor((lng - bounds._southWest.lng) / (bounds._northEast.lng - bounds._southWest.lng) * this.georasters[0].width);
+        var y = Math.floor((bounds._northEast.lat - lat) / (bounds._northEast.lat - bounds._southWest.lat) * this.georasters[0].height);
         var valueIndicatorText = "-";
         if (x >= 0 && x < this.georasters[0].width && y >= 0 && y < this.georasters[0].height) {
             valueIndicatorText = "";
