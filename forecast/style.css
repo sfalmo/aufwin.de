@@ -168,12 +168,12 @@ body {
     flex-direction: column;
 }
 
-.scaleUnits, .scaleMax, .scaleMin {
+.scaleUnit, .scaleMax, .scaleMin {
     text-align: center;
     padding: 5px;
 }
 
-.scaleUnits {
+.scaleUnit {
     font-weight: bold;
 }
 
@@ -313,6 +313,10 @@ body {
     width: 1em;
     height: 1em;
     vertical-align: middle;
+}
+
+.leaflet-non-interactive {
+    cursor: auto;
 }
 
 @media (max-width: 800px) {

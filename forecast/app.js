@@ -88,10 +88,15 @@ L.RaspRenderer = L.Class.extend({
         this.canvas = canvas;
         L.setOptions(this, options);
     },
-    render: function(georaster) {
+    render: function() {
         throw new Error("Abstract class");
     }
 });
+
+L.raspRenderer = function(canvas, options) {
+    return new L.RaspRenderer(canvas, options);
+};
+
 
 L.RaspRenderer.Plotty = L.RaspRenderer.extend({
     options: {
@@ -103,7 +108,7 @@ L.RaspRenderer.Plotty = L.RaspRenderer.extend({
 
         // Color scales
         var sideScaleContainer = document.getElementById(this.options.sideScaleContainerId);
-        this.sideScaleUnits = L.DomUtil.create('div', 'scaleUnits', sideScaleContainer);
+        this.sideScaleUnit = L.DomUtil.create('div', 'scaleUnit', sideScaleContainer);
         this.sideScaleMax = L.DomUtil.create('div', 'scaleMax', sideScaleContainer);
         this.sideScaleCanvas = L.DomUtil.create('canvas', 'sideScaleCanvas', sideScaleContainer);
         this.sideScaleCanvas.height = 256;
@@ -116,10 +121,11 @@ L.RaspRenderer.Plotty = L.RaspRenderer.extend({
         this.bottomScaleCanvas.height = 1;
         this.bottomScaleCanvas.width = 256;
         this.bottomScaleMax = L.DomUtil.create('div', 'scaleMax', bottomScaleContainer);
-        this.bottomScaleUnits = L.DomUtil.create('div', 'scaleUnits', bottomScaleContainer);
+        this.bottomScaleUnit = L.DomUtil.create('div', 'scaleUnit', bottomScaleContainer);
 
         plotty.addColorScale("rasp", ["#004dff", "#01f8e9", "#34c00c", "#f8fd00", "#ff9b00", "#ff1400"], [0, 0.2, 0.4, 0.6, 0.8, 1]);
-        plotty.addColorScale("clouds", ["#00000000", "#000000ff"], [0, 1]);
+        plotty.addColorScale("clouds", ["#ffffff", "#000000"], [0, 1]);
+        plotty.addColorScale("pfd", ["#ffffff", "#fec6fe", "#fc64fc", "#7f93e2", "#2e5de5", "#009900", "#57fc00", "#ffe900", "#f08200", "#ae1700"], [0, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 1]);
         this.plottyplot = new plotty.plot({
             canvas: this.canvas,
             domain: [0, 1],
@@ -129,21 +135,36 @@ L.RaspRenderer.Plotty = L.RaspRenderer.extend({
             colorScale: 'rasp',
         });
     },
-    render: function(data, georaster, parameter) {
+    render: function(georaster, domain, unit, colorscale) {
+        this._updateDataset(georaster);
+        this.plottyplot.setDomain(domain);
+        this.plottyplot.setColorScale(colorscale ? colorscale : 'rasp'); // Default to rasp
+        this._updateScale(domain, unit);
+        this.plottyplot.render();
+    },
+    _updateDataset: function(georaster) {
         if (this.plottyplot.datasetAvailable('dataset')) {
             this.plottyplot.removeDataset('dataset');
         }
-        this.plottyplot.addDataset('dataset', data, georaster.width, georaster.height);
-        this.plottyplot.setDomain(parameter.domain);
-        this.plottyplot.setColorScale(parameter.colorscale ? parameter.colorscale : 'rasp'); // Default to rasp
-        this._updateColorscale(parameter.domain, parameter.units);
-        this.plottyplot.render();
+        // It seems like the data has to be shifted down by 1 pixel, but I do not know why
+        // This is a plotting issue, the data in georaster is definitely correct (checked with QGIS)
+        let layers = georaster.length;
+        this.data = new Float32Array(georaster.width * georaster.height);
+        for (let i = 0; i < georaster.width; i++) {
+            this.data[i] = georaster.noDataValue;
+        }
+        for (let i = 1; i < georaster.height; i++) {
+            for (let j = 0; j < georaster.width; j++) {
+                this.data[i * georaster.width + j] = georaster.values[0][i-1][j];
+            }
+        }
+        this.plottyplot.addDataset('dataset', this.data, georaster.width, georaster.height);
     },
-    _updateScale: function(domain, units) {
-        this._updateColorscale(domain, units);
-        this._updateScaleAnnotation(domain[0], domain[1], typeof this.units == 'string' ? this.units : this.units[0]);
+    _updateScale: function(domain, unit) {
+        this._updateColorscale(domain, unit);
+        this._updateScaleAnnotation(domain[0], domain[1], unit);
     },
-    _updateColorscale: function(domain, units) {
+    _updateColorscale: function(domain, unit) {
         let colorScaleCanvas = this.plottyplot.colorScaleCanvas;
         let colorScaleCtx = colorScaleCanvas.getContext('2d');
         let colorScaleData = colorScaleCtx.getImageData(0, 0, colorScaleCanvas.width, colorScaleCanvas.height);
@@ -161,11 +182,11 @@ L.RaspRenderer.Plotty = L.RaspRenderer.extend({
         }
         sideScaleCtx.putImageData(sideScaleData, 0, 0);
     },
-    _updateScaleAnnotation: function(min, max, scaleUnits) {
-        this.sideScaleUnits.innerHTML = scaleUnits;
+    _updateScaleAnnotation: function(min, max, scaleUnit) {
+        this.sideScaleUnit.innerHTML = scaleUnit;
         this.sideScaleMax.innerHTML = max;
         this.sideScaleMin.innerHTML = min;
-        this.bottomScaleUnits.innerHTML = scaleUnits;
+        this.bottomScaleUnit.innerHTML = scaleUnit;
         this.bottomScaleMax.innerHTML = max;
         this.bottomScaleMin.innerHTML = min;
     },
@@ -177,13 +198,102 @@ L.RaspRenderer.Plotty = L.RaspRenderer.extend({
     }
 });
 
-L.raspRenderer = function(canvas, options) {
-    return new L.RaspRenderer(canvas, options);
-};
-
 L.raspRenderer.plotty = function(canvas, options) {
     return new L.RaspRenderer.Plotty(canvas, options);
-}
+};
+
+L.RaspRenderer.Windbarbs = L.RaspRenderer.extend({
+    initialize: function(layerGroup) {
+        this.layerGroup = layerGroup;
+    },
+    render: function(georasterSpeed, georasterAngle) {
+        this.barbs = [];
+        this.minDistDeg = 0.5;
+        var strideX = Math.ceil(this.minDistDeg / georasterSpeed.pixelWidth);
+        var strideY = Math.ceil(this.minDistDeg / georasterSpeed.pixelHeight);
+        for (let i = Math.floor(strideY / 2); i < georasterSpeed.height - Math.floor(strideY / 2); i += strideY) {
+            for (let j = Math.floor(strideX / 2); j < georasterSpeed.width - Math.floor(strideX / 2); j += strideX) {
+                var speed = georasterSpeed.values[0][i][j];
+                var angle = georasterAngle.values[0][i][j];
+                if (speed != georasterSpeed.noDataValue && angle != georasterAngle.noDataValue) {
+                    var svg = this._getBarb(speed * 1.94384, angle, 80);
+                    var divIcon = L.divIcon({
+                        className: "leaflet-data-marker leaflet-non-interactive",
+                        keyboard: false,
+                        iconSize: [80, 80],
+                        iconAnchor: [40, 40],
+                        html: L.Util.template(svg)
+                    });
+                    this.barbs.push({position: this._getPosition(georasterSpeed, i, j), icon: divIcon});
+                }
+            }
+        }
+        this.barbs.forEach(barb => {
+            if (barb.position) {
+                this.layerGroup.addLayer(L.marker(barb.position, {icon: barb.icon}));
+            }
+        });
+    },
+    _getPosition(georaster, i, j) {
+        var lat = georaster.ymax - (i + 0.5) * georaster.pixelHeight;
+        var lng = georaster.xmin + (j + 0.5) * georaster.pixelHeight;
+        return [lat, lng];
+    },
+    _getFlagSvgPath: function(speed) {
+        var ten   = 0;
+        var five  = 0;
+        var fifty = 0;
+        var index = 0;
+        var i;
+        var path = "";
+        if (speed > 0) {
+            if (speed <= 7) {
+                path += "M0 2 L8 2 ";
+                index = 1;
+            } else {
+                path += "M1 2 L8 2 ";
+            }
+            five = Math.floor(speed / 5);
+            if (speed % 5 >= 3) {
+                five += 1;
+            }
+            fifty = Math.floor(five / 10);
+            five -= fifty * 10;
+            ten = Math.floor(five / 2);
+            five -= ten * 2;
+        }
+        var j;
+        for (i = 0; i < fifty; i++) {
+            j = index + 2 * i;
+            path += "M" + j + " 0 L" + (j + 1) + " 2 L" + j + " 2 L" + j + " 0 ";
+        }
+        if (fifty > 0) {
+            index += 2 * (fifty - 0.5);
+        }
+        for (i = 0; i < ten; i++) {
+            j = index + i;
+            path += "M" + j + " 0 L" + (j + 1) + " 2 ";
+        }
+        index += ten;
+        for (i = 0; i < five; i++) {
+            j = index + i;
+            path += "M" + (j + 0.5) + " 1 L" + (j + 1) + " 2 ";
+        }
+        path += "Z";
+        return path;
+    },
+    _getBarb: function(speedKt, angle, size) {
+        var flagPath = this._getFlagSvgPath(speedKt);
+        var halfsize = Math.floor(size / 2);
+        size = halfsize * 2;
+        return `<svg width="${size}" height="${size}" viewBox="0 0 20 20"><path transform='translate(10 10) rotate(${angle + 90} 0 0) translate(-8 -2)' stroke='#000' stroke-width='0.5' d='${flagPath}'/></svg>`;
+    }
+});
+
+L.raspRenderer.windbarbs = function(canvas, options) {
+    return new L.RaspRenderer.Windbarbs(canvas, options);
+};
+
 
 L.RaspLayer = L.Layer.extend({
     initialize: function(options) {
@@ -192,12 +302,13 @@ L.RaspLayer = L.Layer.extend({
     onAdd: function(map) {
         this._map = map;
 
-        // Initialize canvas
         this.canvas = document.createElement('canvas');
         this.overlay = L.imageOverlay(this.canvas.toDataURL(), [[0,1], [0,1]]).addTo(this._map); // Bounds get updated anyway
+        this.layerGroup = L.layerGroup([]).addTo(this._map);
 
         // Renderers
         this.plottyRenderer = L.raspRenderer.plotty(this.canvas);
+        this.windbarbRenderer = L.raspRenderer.windbarbs(this.layerGroup);
 
         // Value indicator
         this.valueIndicator = L.control.valueIndicator();
@@ -212,35 +323,35 @@ L.RaspLayer = L.Layer.extend({
         this.georasters = georasters;
         if (parameter.composite) {
             this.units = parameter.composite.units;
+            this.domains = parameter.composite.domains;
         } else {
-            this.units = parameter.units;
+            this.units = [parameter.unit];
+            this.domains = [parameter.domain];
         }
-        this._updateDatasets(georasters);
         this._plot(georasters, parameter);
         this._updateValueIndicator(this._lastLat, this._lastLng);
     },
-    _updateDatasets: function(georasters) {
-        // It seems like the data has to be shifted down by 1 pixel, but I do not know why
-        // This is a plotting issue, the data in georaster is definitely correct (checked with QGIS)
-        let layers = georasters.length;
-        this.data = new Array(layers);
-        for (let d = 0; d < layers; d++) {
-            this.data[d] = new Float32Array(georasters[d].width * georasters[d].height);
-            for (let i = 0; i < georasters[d].width; i++) {
-                this.data[d][i] = georasters[d].noDataValue;
-            }
-            for (let i = 1; i < georasters[d].height; i++) {
-                for (let j = 0; j < georasters[d].width; j++) {
-                    this.data[d][i * georasters[d].width + j] = georasters[d].values[0][i-1][j];
-                }
-            }
-        }
-    },
     _plot: function(georasters, parameter) {
+        this.layerGroup.clearLayers();
         this.overlay.setBounds([[georasters[0].ymin, georasters[0].xmin], [georasters[0].ymax, georasters[0].xmax]]);
-        this.plottyRenderer.render(this.data[0], georasters[0], parameter);
-        if (parameter.composite) {
-            // TODO
+        // The base parameter is always displayed as a heatmap (currently realized via the plotty renderer)
+        if (!parameter.composite) {
+            this.plottyRenderer.render(georasters[0], this.domains[0], this.units[0], parameter.colorscale);
+        } else {
+            // For composite parameters, the additional fields must also be rendered according to the composite type
+            if (parameter.composite.type == "wstar_bsratio") {
+                // TODO
+            }
+            if (parameter.composite.type == "wind") {
+                this.plottyRenderer.render(georasters[0], this.domains[0], this.units[0]);
+                this.windbarbRenderer.render(georasters[0], georasters[1]);
+            }
+            if (parameter.composite.type == "clouds") {
+                // TODO
+            }
+            if (parameter.composite.type == "press") {
+                // TODO
+            }
         }
         this.overlay.setUrl(this.canvas.toDataURL());
     },
@@ -255,15 +366,16 @@ L.RaspLayer = L.Layer.extend({
             valueIndicatorText = "";
             for (let i = 0; i < this.georasters.length; i++) {
                 var value = this.georasters[i].values[0][y][x].toFixed(0);
-                if (value == this.georasters[i].noDataValue) {
-                    value = "-";
+                if (value != this.georasters[i].noDataValue) {
+                    var valueText = value;
+                    var unitText = this.units[i];
+                    if (i > 0) {
+                        valueIndicatorText += ", ";
+                    }
+                    valueIndicatorText += `${valueText} ${unitText}`;
+                } else {
+                    valueIndicatorText = "-";
                 }
-                var valueText = value;
-                var unitText = typeof this.units == 'string' ? this.units : this.units[i];
-                if (i > 0) {
-                    valueIndicatorText += ", ";
-                }
-                valueIndicatorText += `${valueText} ${unitText}`;
             }
         }
         this.valueIndicator.update(valueIndicatorText);
@@ -679,7 +791,6 @@ L.control.raspControl = function(options) {
 };
 
 var gRaspControl = L.control.raspControl({position: cDefaults.RASPControlLocation}).addTo(gMap);
-console.log(gRaspControl);
 
 // Leaflet needs this because the flexbox it is in does not evaluate to the right height at the beginning
 // Otherwise, bottom tiles are not loaded (because leaflet thinks they are out of scope)
