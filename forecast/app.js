@@ -104,30 +104,37 @@ L.RaspRenderer.Plotty = L.RaspRenderer.extend({
         bottomScaleContainerId: "bottomScaleDiv",
     },
     initialize: function(canvas, options) {
-        this.canvas = canvas;
+        this.targetCanvas = canvas;
+        this.workingCanvas = document.createElement("canvas");
 
         // Color scales
         var sideScaleContainer = document.getElementById(this.options.sideScaleContainerId);
         this.sideScaleUnit = L.DomUtil.create('div', 'scaleUnit', sideScaleContainer);
         this.sideScaleMax = L.DomUtil.create('div', 'scaleMax', sideScaleContainer);
-        this.sideScaleCanvas = L.DomUtil.create('canvas', 'sideScaleCanvas', sideScaleContainer);
+        var sideScaleCanvasContainer = L.DomUtil.create('div', 'sideScaleCanvasDiv', sideScaleContainer);
+        this.sideScaleCanvas = L.DomUtil.create('canvas', '', sideScaleCanvasContainer);
         this.sideScaleCanvas.height = 256;
         this.sideScaleCanvas.width = 1;
+        this.sideScaleIndicator = L.DomUtil.create('div', 'sideScaleIndicator', sideScaleCanvasContainer);
         this.sideScaleMin = L.DomUtil.create('div', 'scaleMin', sideScaleContainer);
 
         var bottomScaleContainer = document.getElementById(this.options.bottomScaleContainerId);
         this.bottomScaleMin = L.DomUtil.create('div', 'scaleMin', bottomScaleContainer);
-        this.bottomScaleCanvas = L.DomUtil.create('canvas', 'bottomScaleCanvas', bottomScaleContainer);
+        var bottomScaleCanvasContainer = L.DomUtil.create('div', 'bottomScaleCanvasDiv', bottomScaleContainer);
+        this.bottomScaleCanvas = L.DomUtil.create('canvas', '', bottomScaleCanvasContainer);
         this.bottomScaleCanvas.height = 1;
         this.bottomScaleCanvas.width = 256;
+        this.bottomScaleIndicator = L.DomUtil.create('div', 'bottomScaleIndicator', bottomScaleCanvasContainer);
         this.bottomScaleMax = L.DomUtil.create('div', 'scaleMax', bottomScaleContainer);
         this.bottomScaleUnit = L.DomUtil.create('div', 'scaleUnit', bottomScaleContainer);
 
         plotty.addColorScale("rasp", ["#004dff", "#01f8e9", "#34c00c", "#f8fd00", "#ff9b00", "#ff1400"], [0, 0.2, 0.4, 0.6, 0.8, 1]);
+        plotty.addColorScale("bsratio", ["#00000040", "#00000020", "#00000020", "#00000000"], [0.2999999, 0.3, 0.6999999, 0.7]);
         plotty.addColorScale("clouds", ["#ffffff", "#000000"], [0, 1]);
+        plotty.addColorScale("cloudpotential", ["#004dff", "#ffffbf", "#ff1400"], [0, 0.5, 1]);
         plotty.addColorScale("pfd", ["#ffffff", "#fec6fe", "#fc64fc", "#7f93e2", "#2e5de5", "#009900", "#57fc00", "#ffe900", "#f08200", "#ae1700"], [0, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 1]);
         this.plottyplot = new plotty.plot({
-            canvas: this.canvas,
+            canvas: this.workingCanvas,
             domain: [0, 1],
             clampLow: true,
             clampHigh: true,
@@ -135,20 +142,24 @@ L.RaspRenderer.Plotty = L.RaspRenderer.extend({
             colorScale: 'rasp',
         });
     },
-    render: function(georaster, domain, unit, colorscale) {
-        this._updateDataset(georaster);
-        this.plottyplot.setDomain(domain);
-        this.plottyplot.setColorScale(colorscale ? colorscale : 'rasp'); // Default to rasp
-        this._updateScale(domain, unit);
+    render: function(georaster, options) {
+        this._updateDataset(georaster, options.append);
+        this.plottyplot.setDomain(options.domain);
+        this.plottyplot.setColorScale(options.colorscale ? options.colorscale : 'rasp'); // Default to rasp
         this.plottyplot.render();
+        if (!options.append) {
+            this.targetCanvas.width = this.workingCanvas.width;
+            this.targetCanvas.height = this.workingCanvas.height;
+            this._updateScale(options.domain, options.unit);
+        }
+        this.targetCanvas.getContext('2d').drawImage(this.workingCanvas, 0, 0);
     },
-    _updateDataset: function(georaster) {
+    _updateDataset: function(georaster, append) {
         if (this.plottyplot.datasetAvailable('dataset')) {
             this.plottyplot.removeDataset('dataset');
         }
         // It seems like the data has to be shifted down by 1 pixel, but I do not know why
         // This is a plotting issue, the data in georaster is definitely correct (checked with QGIS)
-        let layers = georaster.length;
         this.data = new Float32Array(georaster.width * georaster.height);
         for (let i = 0; i < georaster.width; i++) {
             this.data[i] = georaster.noDataValue;
@@ -190,6 +201,17 @@ L.RaspRenderer.Plotty = L.RaspRenderer.extend({
         this.bottomScaleMax.innerHTML = max;
         this.bottomScaleMin.innerHTML = min;
     },
+    updateScaleIndicator: function(value) {
+        this.sideScaleIndicator.style.visibility = 'visible';
+        this.bottomScaleIndicator.style.visibility = 'visible';
+        var posPercent = (value - this.sideScaleMin.innerHTML) / (this.sideScaleMax.innerHTML - this.sideScaleMin.innerHTML) * 100;
+	this.sideScaleIndicator.style.bottom = `${posPercent}%`;
+	this.bottomScaleIndicator.style.left = `${posPercent}%`;
+    },
+    hideScaleIndicator: function() {
+        this.sideScaleIndicator.style.visibility = 'hidden';
+        this.bottomScaleIndicator.style.visibility = 'hidden';
+    },
     quantize: function(value) {
         this.plottyplot.setExpression(`floor(dataset / ${value} + 0.5) * ${value}`);
     },
@@ -218,8 +240,7 @@ L.RaspRenderer.Windbarbs = L.RaspRenderer.extend({
                 if (speed != georasterSpeed.noDataValue && angle != georasterAngle.noDataValue) {
                     var svg = this._getBarb(speed * 1.94384, angle, 80);
                     var divIcon = L.divIcon({
-                        className: "leaflet-data-marker leaflet-non-interactive",
-                        keyboard: false,
+                        className: "leaflet-data-marker",
                         iconSize: [80, 80],
                         iconAnchor: [40, 40],
                         html: L.Util.template(svg)
@@ -230,7 +251,11 @@ L.RaspRenderer.Windbarbs = L.RaspRenderer.extend({
         }
         this.barbs.forEach(barb => {
             if (barb.position) {
-                this.layerGroup.addLayer(L.marker(barb.position, {icon: barb.icon}));
+                this.layerGroup.addLayer(L.marker(barb.position, {
+                    icon: barb.icon,
+                    interactive: false,
+                    keyboard: false
+                }));
             }
         });
     },
@@ -336,21 +361,23 @@ L.RaspLayer = L.Layer.extend({
         this.overlay.setBounds([[georasters[0].ymin, georasters[0].xmin], [georasters[0].ymax, georasters[0].xmax]]);
         // The base parameter is always displayed as a heatmap (currently realized via the plotty renderer)
         if (!parameter.composite) {
-            this.plottyRenderer.render(georasters[0], this.domains[0], this.units[0], parameter.colorscale);
+            this.plottyRenderer.render(georasters[0], {domain: this.domains[0], unit: this.units[0], colorscale: parameter.colorscale});
         } else {
             // For composite parameters, the additional fields must also be rendered according to the composite type
             if (parameter.composite.type == "wstar_bsratio") {
-                // TODO
+                this.plottyRenderer.render(georasters[0], {domain: this.domains[0], unit: this.units[0]});
+                this.plottyRenderer.render(georasters[1], {domain: this.domains[1], unit: this.units[1], colorscale: 'bsratio', append: true});
             }
             if (parameter.composite.type == "wind") {
-                this.plottyRenderer.render(georasters[0], this.domains[0], this.units[0]);
+                this.plottyRenderer.render(georasters[0], {domain: this.domains[0], unit: this.units[0]});
                 this.windbarbRenderer.render(georasters[0], georasters[1]);
             }
             if (parameter.composite.type == "clouds") {
                 // TODO
             }
             if (parameter.composite.type == "press") {
-                // TODO
+                this.plottyRenderer.render(georasters[0], {domain: this.domains[0], unit: this.units[0]});
+                this.windbarbRenderer.render(georasters[1], georasters[2]);
             }
         }
         this.overlay.setUrl(this.canvas.toDataURL());
@@ -361,23 +388,29 @@ L.RaspLayer = L.Layer.extend({
         var bounds = this.overlay.getBounds();
         var x = Math.floor((lng - bounds._southWest.lng) / (bounds._northEast.lng - bounds._southWest.lng) * this.georasters[0].width);
         var y = Math.floor((bounds._northEast.lat - lat) / (bounds._northEast.lat - bounds._southWest.lat) * this.georasters[0].height);
-        var valueIndicatorText = "-";
-        if (x >= 0 && x < this.georasters[0].width && y >= 0 && y < this.georasters[0].height) {
-            valueIndicatorText = "";
-            for (let i = 0; i < this.georasters.length; i++) {
-                var value = this.georasters[i].values[0][y][x].toFixed(0);
-                if (value != this.georasters[i].noDataValue) {
-                    var valueText = value;
-                    var unitText = this.units[i];
-                    if (i > 0) {
-                        valueIndicatorText += ", ";
-                    }
-                    valueIndicatorText += `${valueText} ${unitText}`;
-                } else {
-                    valueIndicatorText = "-";
+        var values = [];
+        if (x >= 0 && x < this.georasters[0].width && y >= 0 && y < this.georasters[0].height) { // we are inside the domain
+            this.georasters.forEach((georaster, i) => {
+                var value = georaster.values[0][y][x].toFixed(0);
+                if (value != georaster.noDataValue) {
+                    values[i] = value;
                 }
-            }
+            });
         }
+        var valueIndicatorText = "-";
+	if (values.length != 0) {
+            valueIndicatorText = "";
+            values.forEach((value, i) => {
+		if (i != 0) {
+		    valueIndicatorText += ", ";
+		} else {
+		    this.plottyRenderer.updateScaleIndicator(value);
+		}
+		valueIndicatorText += `${value} ${this.units[i]}`;
+            });
+	} else {
+	    this.plottyRenderer.hideScaleIndicator();
+	}
         this.valueIndicator.update(valueIndicatorText);
     },
     _onMouseMove: function(e) {
