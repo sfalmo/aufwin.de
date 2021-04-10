@@ -205,6 +205,12 @@ L.RaspRenderer.Plotty = L.RaspRenderer.extend({
         this.sideScaleIndicator.style.visibility = 'visible';
         this.bottomScaleIndicator.style.visibility = 'visible';
         var posPercent = (value - this.sideScaleMin.innerHTML) / (this.sideScaleMax.innerHTML - this.sideScaleMin.innerHTML) * 100;
+	if (posPercent > 100) {
+	    posPercent = 100;
+	}
+	if (posPercent < 0) {
+	    posPercent = 0;
+	}
 	this.sideScaleIndicator.style.bottom = `${posPercent}%`;
 	this.bottomScaleIndicator.style.left = `${posPercent}%`;
     },
@@ -453,19 +459,6 @@ function getCyclicNextIndex(select) {
     return index;
 }
 
-function makePopup(e, imageUrl, popupImage) {
-    var popupContent = document.createElement('div');
-    var popupLink = document.createElement("A");
-    popupLink.innerHTML = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 48 48'><path d='M38 38H10V10h14V6H10c-2.21 0-4 1.79-4 4v28c0 2.21 1.79 4 4 4h28c2.21 0 4-1.79 4-4V24h-4v14zM28 6v4h7.17L15.51 29.66l2.83 2.83L38 12.83V20h4V6H28z'/></svg>";
-    popupLink.href = imageUrl;
-    popupLink.title = dict["Show in separate window"];
-    popupLink.target = "_blank";
-    popupContent.appendChild(popupLink);
-    popupContent.appendChild(popupImage);
-    L.popup({maxWidth: "auto"}).setLatLng(e.target.getLatLng()).setContent(popupContent).openOn(gMap);
-    gImageOverlayLoadingAnimation.style.visibility = "hidden";
-}
-
 
 L.Control.RASPControl = L.Control.extend({
     onAdd: function(map) {
@@ -473,6 +466,11 @@ L.Control.RASPControl = L.Control.extend({
         this._initTitle();
         this._initPanel();
         this._initRaspLayer();
+
+        this._map.on('popupclose', (e) => {
+            console.log("Popup close");
+            this.currentPopup = null;
+        });
 
         this.opacityLevel = 0.7;
         this.opacityDelta = 0.1;
@@ -686,6 +684,13 @@ L.Control.RASPControl = L.Control.extend({
         var urls = getDataUrls(modelDir, parameterKey, time);
         this._updateTitle(urls.titleUrl, parameter.longname, day);
         this._updatePlot(urls.geotiffUrls, parameter);
+        if (this.currentPopup && this.currentPopup.type == "sounding") {
+            this._updateSounding(modelDir, time);
+        }
+    },
+    _updateSounding: function(modelDir, time) {
+        this.currentPopup.imageUrl = cDefaults.forecastServerRoot + "/" + modelDir + "/sounding" + this.currentPopup.key + ".curr." + time + "lst.d2.png";
+        this.currentPopup.image.src = this.currentPopup.imageUrl;
     },
     _updateTitle: function(titleUrl, parameterLongname, day) {
         this._raspTitle.parameter.innerHTML = parameterLongname;
@@ -761,6 +766,32 @@ L.Control.RASPControl = L.Control.extend({
             this.meteogramOverlay.remove();
         }
     },
+    getPopupContent: function(imageUrl, imageBlob) {
+        var popupContent = document.createElement('div');
+        var popupLink = document.createElement("A");
+        popupLink.innerHTML = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 48 48'><path d='M38 38H10V10h14V6H10c-2.21 0-4 1.79-4 4v28c0 2.21 1.79 4 4 4h28c2.21 0 4-1.79 4-4V24h-4v14zM28 6v4h7.17L15.51 29.66l2.83 2.83L38 12.83V20h4V6H28z'/></svg>";
+        popupLink.href = imageUrl;
+        popupLink.title = dict["Show in separate window"];
+        popupLink.target = "_blank";
+        popupContent.appendChild(popupLink);
+        var popupImage = document.createElement('img');
+        popupImage.setAttribute("class", "imagePopup");
+        popupImage.src = URL.createObjectURL(imageBlob);
+        popupContent.appendChild(popupImage);
+        return popupContent;
+    },
+    updatePopup: function() {
+        var popupContent = document.createElement('div');
+        var popupLink = document.createElement("A");
+        popupLink.innerHTML = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 48 48'><path d='M38 38H10V10h14V6H10c-2.21 0-4 1.79-4 4v28c0 2.21 1.79 4 4 4h28c2.21 0 4-1.79 4-4V24h-4v14zM28 6v4h7.17L15.51 29.66l2.83 2.83L38 12.83V20h4V6H28z'/></svg>";
+        popupLink.href = this.currentPopup.imageUrl;
+        popupLink.title = dict["Show in separate window"];
+        popupLink.target = "_blank";
+        popupContent.appendChild(popupLink);
+        popupContent.appendChild(this.currentPopup.image);
+        this.currentPopup.popup.setContent(popupContent);
+        gImageOverlayLoadingAnimation.style.visibility = "hidden";
+    },
     getSoundingMarkers: function(modelKey) {
         var markers = [];
         var soundings = cSoundings[modelKey];
@@ -772,15 +803,19 @@ L.Control.RASPControl = L.Control.extend({
                     .on('click', e => {
                         var modelDir = this.modelDaySelect.value;
                         var time = this.timeSelect.value;
-                        var imageUrl = cDefaults.forecastServerRoot + "/" + modelDir + "/sounding" + soundingKey + ".curr." + time + "lst.d2.png";
-                        var popupImage = new Image();
-                        popupImage.setAttribute("class", "imagePopup");
-                        popupImage.onload = () => {
-                            makePopup(e, imageUrl, popupImage);
+                        this.currentPopup = {type: "sounding", key: soundingKey};
+                        this.currentPopup.imageUrl = cDefaults.forecastServerRoot + "/" + modelDir + "/sounding" + soundingKey + ".curr." + time + "lst.d2.png";
+                        this.currentPopup.popup = L.popup({maxWidth: "auto"})
+                            .setLatLng(e.target.getLatLng())
+                            .openOn(this._map);
+                        this.currentPopup.image = new Image();
+                        this.currentPopup.image.setAttribute("class", "imagePopup");
+                        this.currentPopup.image.onload = () => {
+                            this.updatePopup();
                         };
-                        popupImage.src = imageUrl;
+                        this.currentPopup.image.src = this.currentPopup.imageUrl;
                         setTimeout(() => {
-                            if (!popupImage.complete) {
+                            if (!this.currentPopup.image.complete) {
                                 gImageOverlayLoadingAnimation.style.visibility = "visible";
                             }
                         }, cDefaults.loadingAnimationDelay);
@@ -799,15 +834,19 @@ L.Control.RASPControl = L.Control.extend({
                     .bindTooltip(meteogram.name)
                     .on('click', e => {
                         var modelDir = this.modelDaySelect.value;
-                        var imageUrl = cDefaults.forecastServerRoot + "/" + modelDir + "/meteogram_" + meteogramKey + ".png";
-                        var popupImage = new Image();
-                        popupImage.setAttribute("class", "imagePopup");
-                        popupImage.onload = () => {
-                            makePopup(e, imageUrl, popupImage);
+                        this.currentPopup = {type: "meteogram", key: meteogramKey};
+                        this.currentPopup.imageUrl = cDefaults.forecastServerRoot + "/" + modelDir + "/meteogram_" + meteogramKey + ".png";
+                        this.currentPopup.popup = L.popup({maxWidth: "auto"})
+                            .setLatLng(e.target.getLatLng())
+                            .openOn(this._map);
+                        this.currentPopup.image = new Image();
+                        this.currentPopup.image.setAttribute("class", "imagePopup");
+                        this.currentPopup.image.onload = () => {
+                            this.updatePopup();
                         };
-                        popupImage.src = imageUrl;
+                        this.currentPopup.image.src = this.currentPopup.imageUrl;
                         setTimeout(() => {
-                            if (!popupImage.complete) {
+                            if (!this.currentPopup.image.complete) {
                                 gImageOverlayLoadingAnimation.style.visibility = "visible";
                             }
                         }, cDefaults.loadingAnimationDelay);
