@@ -73,7 +73,7 @@ const cParameters = {
     "wblmaxmin":     { "longname": dict["wblmaxmin.longname"],     "primary": false,    "description": dict["wblmaxmin.description"], unit: "cm/s", domain: [-250, 250] },
     "zwblmaxmin":    { "longname": dict["zwblmaxmin.longname"],    "primary": false,    "description": dict["zwblmaxmin.description"], unit: "m", domain: [0, 3000] },
     "sfcsunpct":     { "longname": dict["sfcsunpct.longname"],     "primary": true,     "description": dict["sfcsunpct.description"], unit: "%", domain: [0, 100] },
-    "sfcshf":        { "longname": dict["sfcshf.longname"],        "primary": false,    "description": dict["sfcshf.description"], unit: "W/m²", domain: [-50, 300] },
+    "sfcshf":        { "longname": dict["sfcshf.longname"],        "primary": false,    "description": dict["sfcshf.description"], unit: "W/m²", domain: [-50, 400] },
     "sfctemp":       { "longname": dict["sfctemp.longname"],       "primary": true,     "description": dict["sfctemp.description"], unit: "°C", domain: [-10, 40] },
     "sfcdewpt":      { "longname": dict["sfcdewpt.longname"],      "primary": true,     "description": dict["sfcdewpt.description"], unit: "°C", domain: [-20, 30] },
     "mslpress":      { "longname": dict["mslpress.longname"],      "primary": false,    "description": dict["mslpress.description"], unit: "hPa" },

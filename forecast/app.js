@@ -116,6 +116,8 @@ L.RaspRenderer.Plotty = L.RaspRenderer.extend({
         this.sideScaleCanvas.height = 256;
         this.sideScaleCanvas.width = 1;
         this.sideScaleIndicator = L.DomUtil.create('div', 'sideScaleIndicator', sideScaleCanvasContainer);
+        this.sideScaleIndicatorMarker = L.DomUtil.create('div', 'sideScaleIndicatorMarker', this.sideScaleIndicator);
+        this.sideScaleIndicatorValue = L.DomUtil.create('div', 'sideScaleIndicatorValue', this.sideScaleIndicator);
         this.sideScaleMin = L.DomUtil.create('div', 'scaleMin', sideScaleContainer);
 
         var bottomScaleContainer = document.getElementById(this.options.bottomScaleContainerId);
@@ -125,6 +127,8 @@ L.RaspRenderer.Plotty = L.RaspRenderer.extend({
         this.bottomScaleCanvas.height = 1;
         this.bottomScaleCanvas.width = 256;
         this.bottomScaleIndicator = L.DomUtil.create('div', 'bottomScaleIndicator', bottomScaleCanvasContainer);
+        this.bottomScaleIndicatorMarker = L.DomUtil.create('div', 'bottomScaleIndicatorMarker', this.bottomScaleIndicator);
+        this.bottomScaleIndicatorValue = L.DomUtil.create('div', 'bottomScaleIndicatorValue', this.bottomScaleIndicator);
         this.bottomScaleMax = L.DomUtil.create('div', 'scaleMax', bottomScaleContainer);
         this.bottomScaleUnit = L.DomUtil.create('div', 'scaleUnit', bottomScaleContainer);
 
@@ -205,14 +209,11 @@ L.RaspRenderer.Plotty = L.RaspRenderer.extend({
         this.sideScaleIndicator.style.visibility = 'visible';
         this.bottomScaleIndicator.style.visibility = 'visible';
         var posPercent = (value - this.sideScaleMin.innerHTML) / (this.sideScaleMax.innerHTML - this.sideScaleMin.innerHTML) * 100;
-	if (posPercent > 100) {
-	    posPercent = 100;
-	}
-	if (posPercent < 0) {
-	    posPercent = 0;
-	}
-	this.sideScaleIndicator.style.bottom = `${posPercent}%`;
-	this.bottomScaleIndicator.style.left = `${posPercent}%`;
+        posPercent = Math.max(0, Math.min(100, posPercent));
+        this.sideScaleIndicator.style.bottom = `${posPercent}%`;
+        this.bottomScaleIndicator.style.left = `${posPercent}%`;
+        this.sideScaleIndicatorValue.innerHTML = value;
+        this.bottomScaleIndicatorValue.innerHTML = value;
     },
     hideScaleIndicator: function() {
         this.sideScaleIndicator.style.visibility = 'hidden';
@@ -404,19 +405,19 @@ L.RaspLayer = L.Layer.extend({
             });
         }
         var valueIndicatorText = "-";
-	if (values.length != 0) {
+        if (values.length != 0) {
             valueIndicatorText = "";
             values.forEach((value, i) => {
-		if (i != 0) {
-		    valueIndicatorText += ", ";
-		} else {
-		    this.plottyRenderer.updateScaleIndicator(value);
-		}
-		valueIndicatorText += `${value} ${this.units[i]}`;
+                if (i != 0) {
+                    valueIndicatorText += ", ";
+                } else {
+                    this.plottyRenderer.updateScaleIndicator(value);
+                }
+                valueIndicatorText += `${value} ${this.units[i]}`;
             });
-	} else {
-	    this.plottyRenderer.hideScaleIndicator();
-	}
+        } else {
+            this.plottyRenderer.hideScaleIndicator();
+        }
         this.valueIndicator.update(valueIndicatorText);
     },
     _onMouseMove: function(e) {
@@ -685,12 +686,9 @@ L.Control.RASPControl = L.Control.extend({
         this._updateTitle(urls.titleUrl, parameter.longname, day);
         this._updatePlot(urls.geotiffUrls, parameter);
         if (this.currentPopup && this.currentPopup.type == "sounding") {
-            this._updateSounding(modelDir, time);
+            this.currentPopup.imageUrl = cDefaults.forecastServerRoot + "/" + modelDir + "/sounding" + this.currentPopup.key + ".curr." + time + "lst.d2.png";
+            this.currentPopup.image.src = this.currentPopup.imageUrl;
         }
-    },
-    _updateSounding: function(modelDir, time) {
-        this.currentPopup.imageUrl = cDefaults.forecastServerRoot + "/" + modelDir + "/sounding" + this.currentPopup.key + ".curr." + time + "lst.d2.png";
-        this.currentPopup.image.src = this.currentPopup.imageUrl;
     },
     _updateTitle: function(titleUrl, parameterLongname, day) {
         this._raspTitle.parameter.innerHTML = parameterLongname;
