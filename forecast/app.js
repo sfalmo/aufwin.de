@@ -208,6 +208,8 @@ gImageOverlayPreload.onerror = () => {
 var gSoundingOverlay = getSoundingMarkers(cDefaultModel);
 var gMeteogramOverlay = getMeteogramMarkers(cDefaultModel);
 
+var gCurrentPopup = null;
+gMap.on('popupclose', (e) => { gCurrentPopup = null; });
 var gPopupPane = document.getElementsByClassName("leaflet-popup-pane")[0];
 
 gMap.on('click', onMapClick); // left single click
@@ -436,6 +438,12 @@ function updateOverlay() {
         }
     }, cLoadingAnimationDelay);
 
+    // Update sounding popup
+    if (gCurrentPopup && gCurrentPopup.type == "sounding") {
+        gCurrentPopup.imageUrl = cForecastServerRoot + "/" + modelDir + "/sounding" + gCurrentPopup.key + ".curr." + time + "lst.d2.png";
+        gCurrentPopup.image.src = gCurrentPopup.imageUrl;
+    }
+
     // Maybe we should preload the next timepoint
     // var nextTime = gTimeSelect[getCyclicNextTimeIndex()].value;
     // var nextUrls = getImageUrls(modelDir, parameter, nextTime);
@@ -469,6 +477,19 @@ function toggleSoundingsOrMeteograms() {
     }
 }
 
+function updatePopup() {
+    var popupContent = document.createElement('div');
+    var popupLink = document.createElement("A");
+    popupLink.innerHTML = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 48 48'><path d='M38 38H10V10h14V6H10c-2.21 0-4 1.79-4 4v28c0 2.21 1.79 4 4 4h28c2.21 0 4-1.79 4-4V24h-4v14zM28 6v4h7.17L15.51 29.66l2.83 2.83L38 12.83V20h4V6H28z'/></svg>";
+    popupLink.href = gCurrentPopup.imageUrl;
+    popupLink.title = dict["Show in separate window"];
+    popupLink.target = "_blank";
+    popupContent.appendChild(popupLink);
+    popupContent.appendChild(gCurrentPopup.image);
+    gCurrentPopup.popup.setContent(popupContent);
+    gImageOverlayLoadingAnimation.style.visibility = "hidden";
+}
+
 function getSoundingMarkers(modelKey) {
     var markers = [];
     var soundings = cSoundings[modelKey];
@@ -480,15 +501,17 @@ function getSoundingMarkers(modelKey) {
                 .on('click', function(e) {
                     var modelDir = gModelDaySelect.value;
                     var time = gTimeSelect.value;
-                    var imageUrl = cForecastServerRoot + "/" + modelDir + "/sounding" + soundingKey + ".curr." + time + "lst.d2.png";
-                    var popupImage = new Image();
-                    popupImage.setAttribute("class", "imagePopup");
-                    popupImage.onload = () => {
-                        makePopup(e, imageUrl, popupImage);
-                    };
-                    popupImage.src = imageUrl;
+                    gCurrentPopup = {type: "sounding", key: soundingKey};
+                    gCurrentPopup.imageUrl = cForecastServerRoot + "/" + modelDir + "/sounding" + soundingKey + ".curr." + time + "lst.d2.png";
+                    gCurrentPopup.popup = L.popup({maxWidth: "auto"})
+                        .setLatLng(e.target.getLatLng())
+                        .openOn(gMap);
+                    gCurrentPopup.image = new Image();
+                    gCurrentPopup.image.setAttribute("class", "imagePopup");
+                    gCurrentPopup.image.onload = () => { updatePopup(); };
+                    gCurrentPopup.image.src = gCurrentPopup.imageUrl;
                     setTimeout(() => {
-                        if (!popupImage.complete) {
+                        if (!gCurrentPopup.image.complete) {
                             gImageOverlayLoadingAnimation.style.visibility = "visible";
                         }
                     }, cLoadingAnimationDelay);
@@ -508,15 +531,17 @@ function getMeteogramMarkers(modelKey) {
                 .bindTooltip(meteogram.name)
                 .on('click', function(e) {
                     var modelDir = gModelDaySelect.value;
-                    var imageUrl = cForecastServerRoot + "/" + modelDir + "/meteogram_" + meteogramKey + ".png";
-                    var popupImage = new Image();
-                    popupImage.setAttribute("class", "imagePopup");
-                    popupImage.onload = () => {
-                        makePopup(e, imageUrl, popupImage);
-                    };
-                    popupImage.src = imageUrl;
+                    gCurrentPopup = {type: "meteogram", key: meteogramKey};
+                    gCurrentPopup.imageUrl = cForecastServerRoot + "/" + modelDir + "/meteogram_" + meteogramKey + ".png";
+                    gCurrentPopup.popup = L.popup({maxWidth: "auto"})
+                        .setLatLng(e.target.getLatLng())
+                        .openOn(gMap);
+                    gCurrentPopup.image = new Image();
+                    gCurrentPopup.image.setAttribute("class", "imagePopup");
+                    gCurrentPopup.image.onload = () => { updatePopup(); };
+                    gCurrentPopup.image.src = gCurrentPopup.imageUrl;
                     setTimeout(() => {
-                        if (!popupImage.complete) {
+                        if (!gCurrentPopup.image.complete) {
                             gImageOverlayLoadingAnimation.style.visibility = "visible";
                         }
                     }, cLoadingAnimationDelay);
