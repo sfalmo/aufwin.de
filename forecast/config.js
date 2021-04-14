@@ -96,7 +96,7 @@ const cParameters = {
     "zblcldif":      { "longname": dict["zblcldif.longname"],      "primary": false,    "description": dict["zblcldif.description"], unit: "m", domain: [-1000, 1000], colorscale: "cloudpotential" },
     "zblcl":         { "longname": dict["zblcl.longname"],         "primary": false,    "description": dict["zblcl.description"], unit: "m", domain: [0, 3000] },
     "zblclmask":     { "longname": dict["zblclmask.longname"],     "primary": true,     "description": dict["zblclmask.description"], unit: "m", domain: [0, 3000] },
-    "blicw":         { "longname": dict["blicw.longname"],         "primary": false,    "description": dict["blicw.description"], unit: " ", domain: [0, 20] }, // maybe get rid of this (DrJack does not know if it is useful because the formula used is so simple)
+    "blicw":         { "longname": dict["blicw.longname"],         "primary": false,    "description": dict["blicw.description"], unit: "g", domain: [0, 100] }, // maybe get rid of this (DrJack does not know if it is useful because the formula used is so simple)
     "blcwbase":      { "longname": dict["blcwbase.longname"],      "primary": false,    "description": dict["blcwbase.description"], unit: "m", domain: [0, 3000] },
     "blcloudpct":    { "longname": dict["blcloudpct.longname"],    "primary": true,     "description": dict["blcloudpct.description"], unit: "%", domain: [0, 100], colorscale: "clouds" },
     "wrf=CFRACL":    { "longname": dict["wrf=CFRACL.longname"],    "primary": false,    "description": dict["wrf=CFRACL.description"], unit: "", domain: [0, 1], colorscale: "clouds" },
