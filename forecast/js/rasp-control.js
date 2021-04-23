@@ -437,6 +437,5 @@ L.Control.RASPControl = L.Control.extend({
 });
 
 L.control.raspControl = function(options) {
-    var raspControl = new L.Control.RASPControl(options);
-    return raspControl;
+    return new L.Control.RASPControl(options);
 };
