@@ -67,12 +67,9 @@ L.Control.RASPControl = L.Control.extend({
     },
     _initTitle: function() {
         this._raspTitle = document.getElementById("titleDiv");
-        this._raspTitle.parameter = L.DomUtil.create('h2', '', this._raspTitle);
-        this._raspTitle.validInfo = L.DomUtil.create('h3', '', this._raspTitle);
-        this._raspTitle.validSymbol1 = L.DomUtil.create('span', '', this._raspTitle.validInfo);
+        this._raspTitle.parameter = L.DomUtil.create('h4', '', this._raspTitle);
+        this._raspTitle.validInfo = L.DomUtil.create('h6', '', this._raspTitle);
         this._raspTitle.validText = L.DomUtil.create('span', '', this._raspTitle.validInfo);
-        this._raspTitle.validSymbol2 = L.DomUtil.create('span', '', this._raspTitle.validInfo);
-        this._raspTitle.drjack = L.DomUtil.create('h6', '', this._raspTitle);
     },
     _initPanel: function() {
         var className = "leaflet-control-layers";
@@ -97,55 +94,54 @@ L.Control.RASPControl = L.Control.extend({
         L.DomEvent.disableScrollPropagation(this._container);
         this._raspPanel = L.DomUtil.create('div', "leaflet-control-layers-list", this._container);
 
-        var modelDayTimeParameterDiv = L.DomUtil.create('div', 'modelDayTimeParameterDiv', this._raspPanel);
-        var modelDayTimeDiv = L.DomUtil.create('div', '', modelDayTimeParameterDiv);
-        this.modelDaySelect = L.DomUtil.create('select', '', modelDayTimeDiv);
+        var modelDayTimeParameterDiv = L.DomUtil.create('div', '', this._raspPanel);
+        var modelDayTimeDiv = L.DomUtil.create('div', 'form-inline mb-2', modelDayTimeParameterDiv);
+        this.modelDaySelect = L.DomUtil.create('select', 'form-control form-control-sm w-auto mr-1', modelDayTimeDiv);
         this.modelDaySelect.onchange = () => { this.modelDayChange(); };
         this.modelDaySelect.title = dict["modelDaySelect_title"];
-        this.timeSelect = L.DomUtil.create('select', '', modelDayTimeDiv);
+        this.timeSelect = L.DomUtil.create('select', 'form-control form-control-sm w-auto', modelDayTimeDiv);
         this.timeSelect.onchange = () => { this.timeChange(); };
         this.timeSelect.title = dict["timeSelect_title"];
-        var parameterDiv = L.DomUtil.create('div', 'parameterDiv', modelDayTimeParameterDiv);
-        var parameterListDiv = L.DomUtil.create('div', 'parameterListDiv', parameterDiv);
-        this.parameterButton = L.DomUtil.create('button', 'parameterButton', parameterListDiv);
-        this.parameterButton.onclick = () => { this.parameterListToggle(); };
-        this.parameterButton.value = "short";
-        this.parameterButton.title = dict["parameterButton_title"];
-        this.parameterButton.innerHTML = "+";
-        this.parameterSelect = L.DomUtil.create('select', 'parameterSelect', parameterListDiv);
+        var parameterDiv = L.DomUtil.create('div', 'mb-2', modelDayTimeParameterDiv);
+        var parameterListOpacityDiv = L.DomUtil.create('div', 'form-inline flex-nowrap mb-1', parameterDiv);
+        this.parameterSelect = L.DomUtil.create('select', 'form-control form-control-sm w-100 mr-1', parameterListOpacityDiv);
+        this.parameterSelect.style = "min-width: 0;";
         this.parameterSelect.onchange = () => { this.parameterChange(); };
         this.parameterSelect.title = dict["parameterSelect_title"];
+        var opacityDiv = L.DomUtil.create('div', 'btn-group', parameterListOpacityDiv);
+        var opacityDownButton = L.DomUtil.create('button', 'btn btn-sm btn-outline-secondary', opacityDiv);
+        opacityDownButton.onclick = () => { this.opacityDn(); };
+        opacityDownButton.title = dict["opacityDecreaseButton_title"];
+        opacityDownButton.innerHTML = "−";
+        var opacityIcon = L.DomUtil.create('span', 'btn btn-sm btn-outline-secondary disabled', opacityDiv);
+        opacityIcon.style = "font-size: 21";
+        var opacityIconImg = L.DomUtil.create('img', 'icon', opacityIcon);
+        opacityIconImg.src = 'img/opacity.svg';
+        var opacityUpButton = L.DomUtil.create('button', 'btn btn-sm btn-outline-secondary', opacityDiv);
+        opacityUpButton.onclick = () => { this.opacityUp(); };
+        opacityUpButton.title = dict["opacityIncreaseButton_title"];
+        opacityUpButton.innerHTML = "+";
         var parameterDetails = L.DomUtil.create('details', '', parameterDiv);
         var parameterSummary = L.DomUtil.create('summary', '', parameterDetails);
         parameterSummary.title = dict["parameterDetails_title"];
         parameterSummary.innerHTML = dict["parameterDetails_summary"];
         this.parameterDescription = L.DomUtil.create('span', 'parameterDescription', parameterDetails);
 
-        var opacityDiv = L.DomUtil.create('div', '', this._raspPanel);
-        var opacityDownButton = L.DomUtil.create('button', '', opacityDiv);
-        opacityDownButton.onclick = () => { this.opacityDn(); };
-        opacityDownButton.title = dict["opacityDecreaseButton_title"];
-        opacityDownButton.innerHTML = "−";
-        var opacityIcon = L.DomUtil.create('span', '', opacityDiv);
-        opacityIcon.style = "font-size: 24";
-        var opacityIconImg = L.DomUtil.create('img', 'icon', opacityIcon);
-        opacityIconImg.src = 'img/opacity.svg';
-        var opacityUpButton = L.DomUtil.create('button', '', opacityDiv);
-        opacityUpButton.onclick = () => { this.opacityUp(); };
-        opacityUpButton.title = dict["opacityIncreaseButton_title"];
-        opacityUpButton.innerHTML = "+";
-
-        var markerDiv = L.DomUtil.create('div', 'markerDiv', this._raspPanel);
-        var soundingLabel = L.DomUtil.create('label', '', markerDiv);
+        var markerDiv = L.DomUtil.create('div', 'form-inline', this._raspPanel);
+        var soundingLabel = L.DomUtil.create('label', 'mr-2', markerDiv);
+        soundingLabel.style = "display: flex; align-items: center; justify-content: center; margin-bottom: 0;";
         soundingLabel.title = dict["soundingCheckbox_label"];
         this.soundingCheckbox = L.DomUtil.create('input', '', soundingLabel);
+        this.soundingCheckbox.style = "position: relative; flex-shrink: 0; margin-right: 0.25rem";
         this.soundingCheckbox.type = 'checkbox';
         this.soundingCheckbox.onchange = () => { this.toggleSoundingsOrMeteograms(); };
         var soundingText = L.DomUtil.create('span', '', soundingLabel);
         soundingText.innerHTML = dict["Soundings"];
         var meteogramLabel = L.DomUtil.create('label', '', markerDiv);
+        meteogramLabel.style = "display: flex; align-items: center; justify-content: center; margin-bottom: 0";
         meteogramLabel.title = dict["meteogramCheckbox_label"];
         this.meteogramCheckbox = L.DomUtil.create('input', '', meteogramLabel);
+        this.meteogramCheckbox.style = "position: relative; flex-shrink: 0; margin-right: 0.25rem";
         this.meteogramCheckbox.type = 'checkbox';
         this.meteogramCheckbox.onchange = () => { this.toggleSoundingsOrMeteograms(); };
         var meteogramText = L.DomUtil.create('span', '', meteogramLabel);
@@ -204,10 +200,9 @@ L.Control.RASPControl = L.Control.extend({
     },
     addModelParameters: function(modelKey) {
         this.parameterSelect.options.length = 0; // Clear all parameters
-        var onlyPrimary = this.parameterButton.value == "short"; // look at state of parameters button to decide if full or reduced set is shown
         var model = cModels[modelKey];
         for (const parameter of model.parameters) {
-            if (onlyPrimary) {
+            if (true) { // TODO: Separate into categories
                 if (cParameters[parameter].primary) {
                     this.parameterSelect.add(new Option(cParameters[parameter].longname, parameter));
                 }
@@ -223,7 +218,6 @@ L.Control.RASPControl = L.Control.extend({
         var {model, day} = this.getModelAndDay();
         this.addModelHours(model, day, this.timeSelect.value); // could have different hours
         this.addModelParameters(model); // could have different parameters
-        this._raspTitle.drjack.innerHTML = "DrJack BLIPMAP " + dict["from"] + " RASP " + dict["GFSA-initiated"] + " " + cModels[model].resolution + "km " + dict["WRF-ARW model"];
         this._map.setView(cModels[model].center, cModels[model].zoom); // recenter the map
         this.soundingOverlay = this.getSoundingMarkers(model);
         this.meteogramOverlay = this.getMeteogramMarkers(model);
@@ -236,21 +230,6 @@ L.Control.RASPControl = L.Control.extend({
         this.selectedParameter = this.parameterSelect.value; // keep a copy of what was last set
         this.parameterDescription.innerHTML = cParameters[this.parameterSelect.value].description;
         this.update();
-    },
-    parameterListToggle: function() {
-        // Toggle button
-        if (this.parameterButton.value == "short") {
-            this.parameterButton.value = "long";
-            this.parameterButton.innerHTML = "−";
-        } else {
-            this.parameterButton.value = "short";
-            this.parameterButton.innerHTML = "+";
-        }
-
-        this.parameterSelect.options.length = 0; // Clear the parameters
-        var {model, day} = this.getModelAndDay();
-        this.addModelParameters(model); // Add the new ones
-        this.parameterChange(); // Update overlays (parameter might not be there anymore)
     },
     update: function() {
         var modelDir = this.modelDaySelect.value;
@@ -282,14 +261,17 @@ L.Control.RASPControl = L.Control.extend({
             .then(titleJson => {
                 this._raspTitle.validText.innerHTML = titleJson["validLocal"] + " (" + titleJson["validZulu"] + ") " + titleJson["validDate"] + " [" + titleJson["fcstTime"] + "]";
                 var valid = isValid(titleJson["validDate"], day);
-                this._raspTitle.validSymbol1.innerHTML = valid ? "✅" : "❌";
-                this._raspTitle.validSymbol2.innerHTML = valid ? "✅" : "❌";
+                if (valid) {
+                    this._raspTitle.validInfo.classList.remove("text-danger");
+                    this._raspTitle.validInfo.classList.add("text-success");
+                } else {
+                    this._raspTitle.validInfo.classList.remove("text-success");
+                    this._raspTitle.validInfo.classList.add("text-danger");
+                }
                 this._raspTitle.validInfo.title = valid ? dict["isValid"] : dict["isNotValid"];
             })
             .catch(err => {
                 this._raspTitle.validText.innerHTML = dict["validityUnknown"];
-                this._raspTitle.validSymbol1.innerHTML = "⚠";
-                this._raspTitle.validSymbol2.innerHTML = "⚠";
                 this._raspTitle.validInfo.title = dict["isUnknownValid"];
             });
     },
