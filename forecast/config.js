@@ -38,9 +38,9 @@ const cModels = {
             "blicw",
             "blcwbase",
             "blcloudpct",
-            "wrf=CFRACL",
-            "wrf=CFRACM",
-            "wrf=CFRACH",
+            "cfracl",
+            "cfracm",
+            "cfrach",
             "rain1",
             "cape",
             "press950",
@@ -99,11 +99,11 @@ const cParameters = {
     "blicw":         { "longname": dict["blicw.longname"],         "primary": false,    "description": dict["blicw.description"], unit: "g", domain: [0, 100] }, // maybe get rid of this (DrJack does not know if it is useful because the formula used is so simple)
     "blcwbase":      { "longname": dict["blcwbase.longname"],      "primary": false,    "description": dict["blcwbase.description"], unit: "m", domain: [0, 3000] },
     "blcloudpct":    { "longname": dict["blcloudpct.longname"],    "primary": true,     "description": dict["blcloudpct.description"], unit: "%", domain: [0, 100], colorscale: "clouds" },
-    "wrf=CFRACL":    { "longname": dict["wrf=CFRACL.longname"],    "primary": false,    "description": dict["wrf=CFRACL.description"], unit: "", domain: [0, 1], colorscale: "clouds" },
-    "wrf=CFRACM":    { "longname": dict["wrf=CFRACM.longname"],    "primary": false,    "description": dict["wrf=CFRACM.description"], unit: "", domain: [0, 1], colorscale: "clouds" },
-    "wrf=CFRACH":    { "longname": dict["wrf=CFRACH.longname"],    "primary": false,    "description": dict["wrf=CFRACH.description"], unit: "", domain: [0, 1], colorscale: "clouds" },
+    "cfracl":        { "longname": dict["cfracl.longname"],    "primary": false,    "description": dict["cfracl.description"], unit: "", domain: [0, 100], colorscale: "clouds" },
+    "cfracm":        { "longname": dict["cfracm.longname"],    "primary": false,    "description": dict["cfracm.description"], unit: "", domain: [0, 100], colorscale: "clouds" },
+    "cfrach":        { "longname": dict["cfrach.longname"],    "primary": false,    "description": dict["cfrach.description"], unit: "", domain: [0, 100], colorscale: "clouds" },
     "clouds":        { "longname": dict["clouds.longname"],        "primary": false,    "description": dict["clouds.description"],
-                       composite: { of: ["wrf=CFRACL", "wrf=CFRACM", "wrf=CFRACH"], units: ["%", "%", "%"], domains: [[0, 100], [0, 100], [0, 100]], type: "clouds" }
+                       composite: { of: ["cfracl", "cfracm", "cfrach"], units: ["%", "%", "%"], domains: [[0, 100], [0, 100], [0, 100]], type: "clouds" }
                      },
     "rain1":         { "longname": dict["rain1.longname"],         "primary": true,     "description": dict["rain1.description"], unit: "mm/h", domain: [0, 10] },
     "cape":          { "longname": dict["cape.longname"],          "primary": false,    "description": dict["cape.description"], unit: "J/kg", domain: [0, 2000] },
