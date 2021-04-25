@@ -271,8 +271,8 @@ L.Control.RASPControl = L.Control.extend({
                 this._raspTitle.validInfo.title = valid ? dict["isValid"] : dict["isNotValid"];
             })
             .catch(err => {
-                this._raspTitle.validText.innerHTML = dict["validityUnknown"];
-                this._raspTitle.validInfo.title = dict["isUnknownValid"];
+                this._raspTitle.validText.innerHTML = dict["isUnknownValid_text"];
+                this._raspTitle.validInfo.title = dict["isUnknownValid_tooltip"];
             });
     },
     _updatePlot: function(geotiffUrls, parameter) {
