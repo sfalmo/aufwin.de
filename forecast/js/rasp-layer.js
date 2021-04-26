@@ -1,6 +1,6 @@
 import valueIndicator from './value-indicator.js';
-import './rasp-renderer-plotty.js';
-import './rasp-renderer-windbarbs.js';
+import raspRendererPlotty from './rasp-renderer-plotty.js';
+import raspRendererWindbarbs from './rasp-renderer-windbarbs.js';
 
 L.RaspLayer = L.Layer.extend({
     initialize: function(options) {
@@ -14,8 +14,8 @@ L.RaspLayer = L.Layer.extend({
         this.layerGroup = L.layerGroup([]).addTo(this._map);
 
         // Renderers
-        this.plottyRenderer = L.raspRenderer.plotty(this.canvas);
-        this.windbarbRenderer = L.raspRenderer.windbarbs(this.layerGroup);
+        this.plottyRenderer = raspRendererPlotty(this.canvas);
+        this.windbarbRenderer = raspRendererWindbarbs(this.layerGroup);
 
         // Value indicator
         this.valueIndicator = valueIndicator();
@@ -100,6 +100,6 @@ L.RaspLayer = L.Layer.extend({
     }
 });
 
-L.raspLayer = function(options) {
+export default function(options) {
     return new L.RaspLayer(options);
 };

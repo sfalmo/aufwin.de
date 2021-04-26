@@ -1,6 +1,4 @@
-import './rasp-renderer.js';
-
-L.RaspRenderer.Plotty = L.RaspRenderer.extend({
+L.RaspRendererPlotty = L.Class.extend({
     options: {
         sideScaleContainerId: "sideScaleDiv",
         bottomScaleContainerId: "bottomScaleDiv",
@@ -129,6 +127,6 @@ L.RaspRenderer.Plotty = L.RaspRenderer.extend({
     }
 });
 
-L.raspRenderer.plotty = function(canvas, options) {
-    return new L.RaspRenderer.Plotty(canvas, options);
+export default function(canvas, options) {
+    return new L.RaspRendererPlotty(canvas, options);
 };

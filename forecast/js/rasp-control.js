@@ -1,52 +1,18 @@
 import { cModels , cCategories , cParameters , cSoundings , cMeteograms , cLayers , cDefaults } from '../config.js';
-import './rasp-layer.js';
-
-// Divs for title and scales
-var gImageOverlayLoadingAnimation = document.getElementById("loadingDiv");
-gImageOverlayLoadingAnimation.style.visibility = 'hidden';
-
-var gSoundingIcon = L.icon({
-    iconUrl: cDefaults.soundingMarker,
-    iconSize: [cDefaults.markerSize, cDefaults.markerSize]
-});
-var gMeteogramIcon = L.icon({
-    iconUrl: cDefaults.meteogramMarker,
-    iconSize: [cDefaults.markerSize, cDefaults.markerSize]
-});
-
-function getDataUrls(modelDir, parameterKey, time) {
-    var baseUrls = [cDefaults.forecastServerRoot + "/" + modelDir + "/" + parameterKey + "."]; // Default (no composite parameter)
-    if (cParameters[parameterKey].composite) {
-        baseUrls = cParameters[parameterKey].composite.of.map(key => cDefaults.forecastServerRoot + "/" + modelDir + "/" + key + ".");
-    }
-    if (parameterKey != "pfd_tot") { // Almost all parameters are time-dependent, PFD being the exception
-        baseUrls = baseUrls.map(base => base + "curr."+time+"lst.d2.");
-    }
-    var geotiffUrls = baseUrls.map(base => base + "data.tiff");
-    var titleUrl = baseUrls[0] + "title.json";
-    return {geotiffUrls: geotiffUrls, titleUrl: titleUrl};
-}
-
-function isValid(dateText, day) {
-    var date = new Date(dateText);
-    var today = new Date();
-    var dateGoal = new Date(today);
-    dateGoal.setDate(dateGoal.getDate() + +day);
-    dateGoal.setHours(0,0,0,0);
-    return date.valueOf() == dateGoal.valueOf();
-}
-
-function getCyclicNextIndex(select) {
-    var index = select.selectedIndex;
-    index++;
-    if (index > select.length - 1) {
-        index = 0;
-    }
-    return index;
-}
+import raspLayer from './rasp-layer.js';
 
 L.Control.RASPControl = L.Control.extend({
+    imageOverlayLoadingAnimation: document.getElementById("loadingDiv"),
+    meteogramIcon: L.icon({
+        iconUrl: cDefaults.meteogramMarker,
+        iconSize: [cDefaults.markerSize, cDefaults.markerSize]
+    }),
+    soundingIcon: L.icon({
+        iconUrl: cDefaults.soundingMarker,
+        iconSize: [cDefaults.markerSize, cDefaults.markerSize]
+    }),
     onAdd: function(map) {
+        this.imageOverlayLoadingAnimation.style.visibility = 'hidden';
         this._map = map;
         this._initTitle();
         this._initPanel();
@@ -178,7 +144,7 @@ L.Control.RASPControl = L.Control.extend({
         L.DomEvent.on(this._collapseLink, 'click', this.collapse, this);
     },
     _initRaspLayer: function() {
-        this._raspLayer = L.raspLayer();
+        this._raspLayer = raspLayer();
         this._raspLayer.addTo(this._map);
     },
     onRemove: function(map) {
@@ -191,6 +157,34 @@ L.Control.RASPControl = L.Control.extend({
     collapse: function () {
         L.DomUtil.removeClass(this._container, 'leaflet-control-layers-expanded');
         return this;
+    },
+    getDataUrls: function(modelDir, parameterKey, time) {
+        var baseUrls = [cDefaults.forecastServerRoot + "/" + modelDir + "/" + parameterKey + "."]; // Default (no composite parameter)
+        if (cParameters[parameterKey].composite) {
+            baseUrls = cParameters[parameterKey].composite.of.map(key => cDefaults.forecastServerRoot + "/" + modelDir + "/" + key + ".");
+        }
+        if (parameterKey != "pfd_tot") { // Almost all parameters are time-dependent, PFD being the exception
+            baseUrls = baseUrls.map(base => base + "curr."+time+"lst.d2.");
+        }
+        var geotiffUrls = baseUrls.map(base => base + "data.tiff");
+        var titleUrl = baseUrls[0] + "title.json";
+        return {geotiffUrls: geotiffUrls, titleUrl: titleUrl};
+    },
+    isValid: function(dateText, day) {
+        var date = new Date(dateText);
+        var today = new Date();
+        var dateGoal = new Date(today);
+        dateGoal.setDate(dateGoal.getDate() + +day);
+        dateGoal.setHours(0,0,0,0);
+        return date.valueOf() == dateGoal.valueOf();
+    },
+    getCyclicNextIndex: function(select) {
+        var index = select.selectedIndex;
+        index++;
+        if (index > select.length - 1) {
+            index = 0;
+        }
+        return index;
     },
     getModelAndDay: function() {
         var resultSplit = this.modelDaySelect.value.split("+");
@@ -285,7 +279,7 @@ L.Control.RASPControl = L.Control.extend({
             this.enableOnMapClick();
         }
         var parameter = cParameters[parameterKey];
-        var urls = getDataUrls(modelDir, parameterKey, time);
+        var urls = this.getDataUrls(modelDir, parameterKey, time);
         this._updateTitle(urls.titleUrl, parameter.longname, day);
         this._updatePlot(urls.geotiffUrls, parameter);
         if (this.currentPopup && this.currentPopup.type == "sounding") {
@@ -301,7 +295,7 @@ L.Control.RASPControl = L.Control.extend({
             })
             .then(titleJson => {
                 this._raspTitle.validText.innerHTML = titleJson["validLocal"] + " (" + titleJson["validZulu"] + ") " + titleJson["validDate"] + " [" + titleJson["fcstTime"] + "]";
-                var valid = isValid(titleJson["validDate"], day);
+                var valid = this.isValid(titleJson["validDate"], day);
                 if (valid) {
                     this._raspTitle.validInfo.classList.remove("text-danger");
                     this._raspTitle.validInfo.classList.add("text-success");
@@ -338,7 +332,7 @@ L.Control.RASPControl = L.Control.extend({
         this._raspLayer.overlay.setOpacity(this.opacityLevel);
     },
     onMapClick: function() {
-        this.timeSelect.selectedIndex = getCyclicNextIndex(this.timeSelect);
+        this.timeSelect.selectedIndex = this.getCyclicNextIndex(this.timeSelect);
         this.update();
     },
     enableOnMapClick: function() {
@@ -370,7 +364,7 @@ L.Control.RASPControl = L.Control.extend({
         popupContent.appendChild(popupLink);
         popupContent.appendChild(this.currentPopup.image);
         this.currentPopup.popup.setContent(popupContent);
-        gImageOverlayLoadingAnimation.style.visibility = "hidden";
+        this.imageOverlayLoadingAnimation.style.visibility = "hidden";
     },
     getSoundingMarkers: function(modelKey) {
         var markers = [];
@@ -378,7 +372,7 @@ L.Control.RASPControl = L.Control.extend({
         for (const soundingKey of Object.keys(soundings)) {
             var sounding = soundings[soundingKey];
             markers.push(
-                L.marker(sounding.location, {icon: gSoundingIcon})
+                L.marker(sounding.location, {icon: this.soundingIcon})
                     .bindTooltip(sounding.name)
                     .on('click', e => {
                         var modelDir = this.modelDaySelect.value;
@@ -396,7 +390,7 @@ L.Control.RASPControl = L.Control.extend({
                         this.currentPopup.image.src = this.currentPopup.imageUrl;
                         setTimeout(() => {
                             if (!this.currentPopup.image.complete) {
-                                gImageOverlayLoadingAnimation.style.visibility = "visible";
+                                this.imageOverlayLoadingAnimation.style.visibility = "visible";
                             }
                         }, cDefaults.loadingAnimationDelay);
                     })
@@ -410,7 +404,7 @@ L.Control.RASPControl = L.Control.extend({
         for (const meteogramKey of Object.keys(meteograms)) {
             var meteogram = meteograms[meteogramKey];
             markers.push(
-                L.marker(meteogram.location, {icon: gMeteogramIcon})
+                L.marker(meteogram.location, {icon: this.meteogramIcon})
                     .bindTooltip(meteogram.name)
                     .on('click', e => {
                         var modelDir = this.modelDaySelect.value;
@@ -427,7 +421,7 @@ L.Control.RASPControl = L.Control.extend({
                         this.currentPopup.image.src = this.currentPopup.imageUrl;
                         setTimeout(() => {
                             if (!this.currentPopup.image.complete) {
-                                gImageOverlayLoadingAnimation.style.visibility = "visible";
+                                this.imageOverlayLoadingAnimation.style.visibility = "visible";
                             }
                         }, cDefaults.loadingAnimationDelay);
                     })
@@ -437,6 +431,6 @@ L.Control.RASPControl = L.Control.extend({
     }
 });
 
-L.control.raspControl = function(options) {
+export default function(options) {
     return new L.Control.RASPControl(options);
 };

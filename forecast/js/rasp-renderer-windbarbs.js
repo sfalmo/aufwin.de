@@ -1,6 +1,4 @@
-import './rasp-renderer.js';
-
-L.RaspRenderer.Windbarbs = L.RaspRenderer.extend({
+L.RaspRendererWindbarbs = L.Class.extend({
     initialize: function(layerGroup) {
         this.layerGroup = layerGroup;
     },
@@ -91,6 +89,6 @@ L.RaspRenderer.Windbarbs = L.RaspRenderer.extend({
     }
 });
 
-L.raspRenderer.windbarbs = function(canvas, options) {
-    return new L.RaspRenderer.Windbarbs(canvas, options);
+export default function(canvas, options) {
+    return new L.RaspRendererWindbarbs(canvas, options);
 };
