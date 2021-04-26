@@ -120,7 +120,7 @@ L.Control.RASPControl = L.Control.extend({
   <use xlink:href="img/sprites.svg#${category}"></use>
 </svg>
 `;
-            catLabel.title = category;
+            catLabel.title = dict["parameterCategory_" + category + "_title"];
             if (category == defaultCategory) { // enable the default category
                 $(catLabel).button('toggle');
             }
@@ -174,7 +174,7 @@ L.Control.RASPControl = L.Control.extend({
         this._collapseLink = L.DomUtil.create('a', 'leaflet-control-collapse-button', this._raspPanel);
         this._collapseLink.innerHTML = '⇱';
         this._collapseLink.title = 'Panel minimieren';
-        this._collapseLink.href = '#collapse';
+        this._collapseLink.href = '#';
         L.DomEvent.on(this._collapseLink, 'click', this.collapse, this);
     },
     _initRaspLayer: function() {
@@ -246,13 +246,18 @@ L.Control.RASPControl = L.Control.extend({
         }
     },
     modelDayChange: function() {
+        var modelDir = this.modelDaySelect.value;
         var {model, day} = this.getModelAndDay();
         this.doModelHours(model, day, this.timeSelect.value); // could have different hours
-        this._map.setView(cModels[model].center, cModels[model].zoom); // recenter the map
+        // this._map.setView(cModels[model].center, cModels[model].zoom); // recenter the map
         this.soundingOverlay = this.getSoundingMarkers(model);
         this.meteogramOverlay = this.getMeteogramMarkers(model);
         this.doParameterList(); // could have different parameters
         this.parameterChange();
+        if (this.currentPopup && this.currentPopup.type == "meteogram") {
+            this.currentPopup.imageUrl = cDefaults.forecastServerRoot + "/" + modelDir + "/meteogram_" + this.currentPopup.key + ".png";
+            this.currentPopup.image.src = this.currentPopup.imageUrl;
+        }
     },
     timeChange: function() {
         this.update();

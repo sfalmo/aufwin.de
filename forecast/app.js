@@ -7,6 +7,8 @@ import './js/rasp-control.js';
 var gMap = L.map('map', {
     center: cModels[cDefaults.model].center,
     zoom: cDefaults.zoom,
+    minZoom: cDefaults.minZoom,
+    maxZoom: cDefaults.maxZoom,
     zoomControl: false,
     doubleClickZoom: false
 });

@@ -50,7 +50,7 @@ var dict = {
     "bsratio.longname": "Auftrieb-/Scher-Verhältnis",
     "bsratio.description": "Verhältnis zwischen thermisch bedingtem Auftrieb und vertikaler Windscherung. Falls dieses Verhältnis klein ist, ist mit zerrissener Thermik zu rechnen - unter 5 mit kaum nutzbarer. Bei konvektiver Wolkenbildung ist das tatsächliche Auftrieb-/Scher-Verhältnis besser als hier vorhergesagt.",
     "wstar_bsratio.longname": "Thermikstärke & Auftrieb-/Scher-Verhältnis",
-    "wstar_bsratio.description": "Zusammengesetzter Plot aus Thermikstärke und Auftrieb-/Scher-Verhältnis. Bereiche mit geringem Auftrieb-/Scher-Verhältnis sind schwach (3 < A/S < 6) bzw. stark (A/S < 3) dargestellt.",
+    "wstar_bsratio.description": "Zusammengesetzter Plot aus Thermikstärke und Auftrieb-/Scher-Verhältnis. Bereiche mit geringem Auftrieb-/Scher-Verhältnis sind hell (3 < A/S < 6) bzw. dunkel (A/S < 3) schattiert dargestellt.",
     "hglider.longname": "Nutzbare Thermikhöhe (MSL)",
     "hglider.description": "Nutzbare Thermikhöhe, d.h. das Minimum aus Höhe kritischer Aufwindstärke, Cumulus-Wolkenbasis und Überentwicklungs-Wolkenbasis.",
     "hwcrit.longname": "Höhe kritischer Aufwindstärke (MSL)",

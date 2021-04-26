@@ -198,6 +198,8 @@ const cDefaults = {
     baseLayer: dict["Topography"],
     overlays: [],
     zoom: 7,
+    minZoom: 6,
+    maxZoom: 13,
     model: "TIR",                   // default model to start on
     parameter: "wstar_bsratio",     // which paramter to start on
     parameterTime: "1300",          // which hour to start on
