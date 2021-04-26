@@ -62,6 +62,7 @@ L.Control.RASPControl = L.Control.extend({
         this.selectedParameter = cDefaults.parameter; // remember last used parameter
         this.doModelDays();
         this.modelDayChange(); // Do the first setup of hours, parameters, overlay, title, scales
+        this.parameterCategoryChange();
 
         return this._container;
     },
@@ -113,13 +114,19 @@ L.Control.RASPControl = L.Control.extend({
             catRadio.type = "radio";
             catRadio.value = category;
             catLabel.style = "cursor: pointer;";
-            catLabel.innerHTML += category;
+            // catLabel.innerHTML += `<img class='parameterCategoryIcon' src='img/${category}.svg'>`;
+            catLabel.innerHTML += `
+<svg class="parameterCategoryIcon">
+  <use xlink:href="img/sprites.svg#${category}"></use>
+</svg>
+`;
             catLabel.title = category;
             if (category == defaultCategory) { // enable the default category
                 $(catLabel).button('toggle');
             }
         }
         this.parameterCategories.onchange = () => { this.parameterCategoryChange(); };
+        this.parameterCategoryDescription = L.DomUtil.create('div', '', parameterDiv);
         var parameterListOpacityDiv = L.DomUtil.create('div', 'form-inline flex-nowrap mb-1', parameterDiv);
         this.parameterSelect = L.DomUtil.create('select', 'form-control form-control-sm w-100 mr-1', parameterListOpacityDiv);
         this.parameterSelect.style = "min-width: 0;";
@@ -251,6 +258,8 @@ L.Control.RASPControl = L.Control.extend({
         this.update();
     },
     parameterCategoryChange: function() {
+        var category = this.getParameterCategory();
+        this.parameterCategoryDescription.innerHTML = dict["parameterCategory_" + category + "_title"];
         this.doParameterList();
         this.parameterChange();
     },

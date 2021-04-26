@@ -306,6 +306,17 @@ body {
 .rasp-control .leaflet-control-layers-toggle {
     background-image: url(img/rasp_control.svg);
 }
+.parameterCategoryIcon {
+    width: 40px;
+    height: 40px;
+    fill: currentColor;
+}
+@media (max-width: 700px) {
+    .parameterCategoryIcon {
+        width: 24px;
+        height: 24px;
+    }
+}
 .parameterSelect {
     /* Mind the space occupied by the parameter toggle button */
     width: calc(100% - 3em);
