@@ -1,4 +1,4 @@
-import { cModels , cParameters , cSoundings , cMeteograms , cLayers , cDefaults } from '../config.js';
+import { cModels , cCategories , cParameters , cSoundings , cMeteograms , cLayers , cDefaults } from '../config.js';
 import './rasp-layer.js';
 
 // Divs for title and scales
@@ -60,7 +60,7 @@ L.Control.RASPControl = L.Control.extend({
         this.opacityDelta = 0.1;
         this.setOpacity();
         this.selectedParameter = cDefaults.parameter; // remember last used parameter
-        this.addModelDays();
+        this.doModelDays();
         this.modelDayChange(); // Do the first setup of hours, parameters, overlay, title, scales
 
         return this._container;
@@ -103,6 +103,23 @@ L.Control.RASPControl = L.Control.extend({
         this.timeSelect.onchange = () => { this.timeChange(); };
         this.timeSelect.title = dict["timeSelect_title"];
         var parameterDiv = L.DomUtil.create('div', 'mb-2', modelDayTimeParameterDiv);
+        this.parameterCategories = L.DomUtil.create('div', 'btn-group btn-group-toggle mb-1', parameterDiv);
+        this.parameterCategories.setAttribute('data-toggle', 'buttons');
+        var defaultCategory = cParameters[cDefaults.parameter].category;
+        for (const category of cCategories) {
+            var catLabel = L.DomUtil.create('label', 'btn btn-outline-primary', this.parameterCategories);
+            var catRadio = L.DomUtil.create('input', '', catLabel);
+            catRadio.name = "parameterCategory";
+            catRadio.type = "radio";
+            catRadio.value = category;
+            catLabel.style = "cursor: pointer;";
+            catLabel.innerHTML += category;
+            catLabel.title = category;
+            if (category == defaultCategory) { // enable the default category
+                $(catLabel).button('toggle');
+            }
+        }
+        this.parameterCategories.onchange = () => { this.parameterCategoryChange(); };
         var parameterListOpacityDiv = L.DomUtil.create('div', 'form-inline flex-nowrap mb-1', parameterDiv);
         this.parameterSelect = L.DomUtil.create('select', 'form-control form-control-sm w-100 mr-1', parameterListOpacityDiv);
         this.parameterSelect.style = "min-width: 0;";
@@ -168,15 +185,24 @@ L.Control.RASPControl = L.Control.extend({
         L.DomUtil.removeClass(this._container, 'leaflet-control-layers-expanded');
         return this;
     },
-    addModelDays: function() {
+    getModelAndDay: function() {
+        var resultSplit = this.modelDaySelect.value.split("+");
+        if (resultSplit.length == 1) {
+            return {model: this.modelDaySelect.value, day: "0"};
+        } else {
+            return {model: resultSplit[0], day: resultSplit[1]};
+        }
+    },
+    getParameterCategory: function() {
+        return this.parameterCategories.querySelector("input:checked").value;
+    },
+    doModelDays: function() {
         const dayNames = [dict["Sunday"], dict["Monday"], dict["Tuesday"], dict["Wednesday"], dict["Thursday"], dict["Friday"], dict["Saturday"]];
         const monthNames = ["Jan", "Feb", dict["Mar"], "Apr", dict["May"], "Jun", "Jul", "Aug", "Sep", dict["Oct"], "Nov", dict["Dec"]];
         const dayRelative = [dict["Today"], dict["Tomorrow"]];
-
         var Now = new Date().getTime();        // current time in ms
         var millisInDay = 24 * 60 * 60 * 1000; // ms in a day
         var T = new Date();
-
         this.modelDaySelect.options.length = 0; // Empty list
         for (const modelKey of Object.keys(cModels)) {
             var model = cModels[modelKey];
@@ -190,7 +216,7 @@ L.Control.RASPControl = L.Control.extend({
             }
         }
     },
-    addModelHours: function(modelKey, day, selectedValue) {
+    doModelHours: function(modelKey, day, selectedValue) {
         this.timeSelect.options.length = 0; // Clear all times
         var model = cModels[modelKey];
         for (const hour of model.hours[day]) {
@@ -198,36 +224,37 @@ L.Control.RASPControl = L.Control.extend({
         }
         this.timeSelect.value = selectedValue ? selectedValue : cDefaults.parameterTime;
     },
-    addModelParameters: function(modelKey) {
+    doParameterList: function() {
+        var {model, day} = this.getModelAndDay();
+        var currentParameter = this.parameterSelect.value;
         this.parameterSelect.options.length = 0; // Clear all parameters
-        var model = cModels[modelKey];
-        for (const parameter of model.parameters) {
-            if (true) { // TODO: Separate into categories
-                if (cParameters[parameter].primary) {
-                    this.parameterSelect.add(new Option(cParameters[parameter].longname, parameter));
-                }
-            } else {
+        var category = this.getParameterCategory();
+        for (const parameter of cModels[model].parameters) {
+            if (cParameters[parameter].category == category) {
                 this.parameterSelect.add(new Option(cParameters[parameter].longname, parameter));
-            }
-            if (parameter == this.selectedParameter) {
-                this.parameterSelect.options[this.parameterSelect.options.length - 1].selected = true;
+                if (currentParameter == parameter) { // Try to keep the currently selected parameter (if it is in the list)
+                    this.parameterSelect.options[this.parameterSelect.options.length - 1].selected = true;
+                }
             }
         }
     },
     modelDayChange: function() {
         var {model, day} = this.getModelAndDay();
-        this.addModelHours(model, day, this.timeSelect.value); // could have different hours
-        this.addModelParameters(model); // could have different parameters
+        this.doModelHours(model, day, this.timeSelect.value); // could have different hours
         this._map.setView(cModels[model].center, cModels[model].zoom); // recenter the map
         this.soundingOverlay = this.getSoundingMarkers(model);
         this.meteogramOverlay = this.getMeteogramMarkers(model);
+        this.doParameterList(); // could have different parameters
         this.parameterChange();
     },
     timeChange: function() {
         this.update();
     },
+    parameterCategoryChange: function() {
+        this.doParameterList();
+        this.parameterChange();
+    },
     parameterChange: function() {
-        this.selectedParameter = this.parameterSelect.value; // keep a copy of what was last set
         this.parameterDescription.innerHTML = cParameters[this.parameterSelect.value].description;
         this.update();
     },
@@ -296,14 +323,6 @@ L.Control.RASPControl = L.Control.extend({
     setOpacity: function() {
         this._raspLayer.overlay.setOpacity(this.opacityLevel);
     },
-    getModelAndDay: function() {
-        var resultSplit = this.modelDaySelect.value.split("+");
-        if (resultSplit.length == 1) {
-            return {model: this.modelDaySelect.value, day: "0"};
-        } else {
-            return {model: resultSplit[0], day: resultSplit[1]};
-        }
-    },
     onMapClick: function() {
         this.timeSelect.selectedIndex = getCyclicNextIndex(this.timeSelect);
         this.update();
@@ -326,20 +345,6 @@ L.Control.RASPControl = L.Control.extend({
         } else {
             this.meteogramOverlay.remove();
         }
-    },
-    getPopupContent: function(imageUrl, imageBlob) {
-        var popupContent = document.createElement('div');
-        var popupLink = document.createElement("A");
-        popupLink.innerHTML = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 48 48'><path d='M38 38H10V10h14V6H10c-2.21 0-4 1.79-4 4v28c0 2.21 1.79 4 4 4h28c2.21 0 4-1.79 4-4V24h-4v14zM28 6v4h7.17L15.51 29.66l2.83 2.83L38 12.83V20h4V6H28z'/></svg>";
-        popupLink.href = imageUrl;
-        popupLink.title = dict["Show in separate window"];
-        popupLink.target = "_blank";
-        popupContent.appendChild(popupLink);
-        var popupImage = document.createElement('img');
-        popupImage.setAttribute("class", "imagePopup");
-        popupImage.src = URL.createObjectURL(imageBlob);
-        popupContent.appendChild(popupImage);
-        return popupContent;
     },
     updatePopup: function() {
         var popupContent = document.createElement('div');
