@@ -355,11 +355,17 @@ L.Control.RASPControl = L.Control.extend({
         if (this.soundingCheckbox.checked) {
             this.soundingOverlay.addTo(this._map);
         } else {
+            if (this.currentPopup && this.currentPopup.type == "sounding") {
+                this.currentPopup.popup.remove();
+            }
             this.soundingOverlay.remove();
         }
         if (this.meteogramCheckbox.checked) {
             this.meteogramOverlay.addTo(this._map);
         } else {
+            if (this.currentPopup && this.currentPopup.type == "meteogram") {
+                this.currentPopup.popup.remove();
+            }
             this.meteogramOverlay.remove();
         }
     },
