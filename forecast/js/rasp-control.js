@@ -317,6 +317,8 @@ L.Control.RASPControl = L.Control.extend({
             .catch(err => {
                 this._raspTitle.validText.innerHTML = dict["isUnknownValid_text"];
                 this._raspTitle.validInfo.title = dict["isUnknownValid_tooltip"];
+                this._raspTitle.validInfo.classList.remove("text-success");
+                this._raspTitle.validInfo.classList.add("text-danger");
             });
     },
     _updatePlot: function(geotiffUrls, parameter) {
