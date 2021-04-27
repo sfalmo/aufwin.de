@@ -1,3 +1,5 @@
+import * as plotty from 'plotty';
+
 L.RaspRendererPlotty = L.Class.extend({
     options: {
         sideScaleContainerId: "sideScaleDiv",

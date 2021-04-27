@@ -1,3 +1,5 @@
+import parseGeoraster from 'georaster';
+
 import { cModels , cCategories , cParameters , cSoundings , cMeteograms , cLayers , cDefaults } from '../config.js';
 import raspLayer from './rasp-layer.js';
 
@@ -244,8 +246,15 @@ L.Control.RASPControl = L.Control.extend({
         var {model, day} = this.getModelAndDay();
         this.doModelHours(model, day, this.timeSelect.value); // could have different hours
         // this._map.setView(cModels[model].center, cModels[model].zoom); // recenter the map
+        if (this.soundingOverlay) {
+            this.soundingOverlay.remove();
+        }
+        if (this.meteogramOverlay) {
+            this.meteogramOverlay.remove();
+        }
         this.soundingOverlay = this.getSoundingMarkers(model);
         this.meteogramOverlay = this.getMeteogramMarkers(model);
+        this.toggleSoundingsOrMeteograms();
         this.doParameterList(); // could have different parameters
         this.parameterChange();
         if (this.currentPopup && this.currentPopup.type == "meteogram") {
