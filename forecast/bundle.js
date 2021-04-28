@@ -211,6 +211,7 @@
         loadingAnimationDelay: 300, // ms. Wait this long before showing a loading animation for the to-be-shown overlay
         zoomLocation: 'bottomleft',            // Zoom control position
         scaleLocation: 'bottomleft',           // Scale position
+        layersLocation: 'topleft',             // Layer selector position
         RASPControlLocation: 'topleft',        // Position of custom RASP data control
         soundingMarker: 'img/sounding.svg',
         meteogramMarker: 'img/meteogram.svg',
@@ -2933,7 +2934,6 @@ ${ids.map(id => `          float ${id}_value = texture2D(u_texture_${id}, v_texC
     // Add default controls
     L.control.scale({position: cDefaults.scaleLocation}).addTo(gMap);
     L.control.zoom({position: cDefaults.zoomLocation}).addTo(gMap);
-    L.control.layers(cLayers.baseLayers, cLayers.overlays).addTo(gMap);
     compactAttribution().addTo(gMap);
 
     cLayers.baseLayers[cDefaults.baseLayer].addTo(gMap);
@@ -2943,6 +2943,7 @@ ${ids.map(id => `          float ${id}_value = texture2D(u_texture_${id}, v_texC
 
     // This sets up all RASP related controls and layers
     var gRaspControl = raspControl({position: cDefaults.RASPControlLocation}).addTo(gMap);
+    L.control.layers(cLayers.baseLayers, cLayers.overlays, {position: cDefaults.layersLocation}).addTo(gMap);
 
     // Leaflet needs this because the flexbox it is in does not evaluate to the right height at the beginning
     // Otherwise, bottom tiles are not loaded (because leaflet thinks they are outside of the viewport)

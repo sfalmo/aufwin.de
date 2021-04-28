@@ -208,6 +208,7 @@ const cDefaults = {
     loadingAnimationDelay: 300, // ms. Wait this long before showing a loading animation for the to-be-shown overlay
     zoomLocation: 'bottomleft',            // Zoom control position
     scaleLocation: 'bottomleft',           // Scale position
+    layersLocation: 'topleft',             // Layer selector position
     RASPControlLocation: 'topleft',        // Position of custom RASP data control
     soundingMarker: 'img/sounding.svg',
     meteogramMarker: 'img/meteogram.svg',
