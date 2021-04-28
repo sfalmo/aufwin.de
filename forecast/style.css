@@ -47,8 +47,8 @@ body {
     justify-content: space-between;
 }
 @media (max-width: 80em) {
-    #top {
-        font-size: smaller;
+    #top h4 {
+        font-size: 1.2rem;
     }
 }
 #titleDiv {

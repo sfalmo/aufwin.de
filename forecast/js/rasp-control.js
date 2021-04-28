@@ -37,8 +37,24 @@ L.Control.RASPControl = L.Control.extend({
     _initTitle: function() {
         this._raspTitle = document.getElementById("titleDiv");
         this._raspTitle.parameter = L.DomUtil.create('h4', '', this._raspTitle);
-        this._raspTitle.validInfo = L.DomUtil.create('h6', '', this._raspTitle);
-        this._raspTitle.validText = L.DomUtil.create('span', '', this._raspTitle.validInfo);
+        var modelDayTimeDiv = L.DomUtil.create('div', 'form-inline justify-content-center flex-nowrap mb-1', this._raspTitle);
+        var modelDayGroup = L.DomUtil.create('div', 'input-group input-group-sm mx-1', modelDayTimeDiv);
+        this.modelDaySelect = L.DomUtil.create('select', 'custom-select w-auto', modelDayGroup);
+        this.modelDaySelect.onchange = () => { this.modelDayChange(); };
+        this.modelDaySelect.title = dict["modelDaySelect_title"];
+        var timeGroup = L.DomUtil.create('div', 'input-group input-group-sm mx-1', modelDayTimeDiv);
+        var timePrev = L.DomUtil.create('div', 'input-group-prepend', timeGroup);
+        this.timePrevButton = L.DomUtil.create('button', 'btn btn-outline-secondary', timePrev);
+        this.timePrevButton.innerHTML = '◄';
+        this.timePrevButton.onclick = () => { this.timeChangeCyclic(-1); };
+        this.timeSelect = L.DomUtil.create('select', 'custom-select w-auto', timeGroup);
+        this.timeSelect.onchange = () => { this.timeChange(); };
+        this.timeSelect.title = dict["timeSelect_title"];
+        var timeNext = L.DomUtil.create('div', 'input-group-append', timeGroup);
+        this.timeNextButton = L.DomUtil.create('button', 'btn btn-outline-secondary', timeNext);
+        this.timeNextButton.innerHTML = '►';
+        this.timeNextButton.onclick = () => { this.timeChangeCyclic(1); };
+        this.validWarning = L.DomUtil.create('div', 'text-danger', this._raspTitle);
     },
     _initPanel: function() {
         var className = "leaflet-control-layers";
@@ -63,15 +79,7 @@ L.Control.RASPControl = L.Control.extend({
         L.DomEvent.disableScrollPropagation(this._container);
         this._raspPanel = L.DomUtil.create('div', "leaflet-control-layers-list", this._container);
 
-        var modelDayTimeParameterDiv = L.DomUtil.create('div', '', this._raspPanel);
-        var modelDayTimeDiv = L.DomUtil.create('div', 'form-inline mb-2', modelDayTimeParameterDiv);
-        this.modelDaySelect = L.DomUtil.create('select', 'form-control form-control-sm w-auto mr-1', modelDayTimeDiv);
-        this.modelDaySelect.onchange = () => { this.modelDayChange(); };
-        this.modelDaySelect.title = dict["modelDaySelect_title"];
-        this.timeSelect = L.DomUtil.create('select', 'form-control form-control-sm w-auto', modelDayTimeDiv);
-        this.timeSelect.onchange = () => { this.timeChange(); };
-        this.timeSelect.title = dict["timeSelect_title"];
-        var parameterDiv = L.DomUtil.create('div', 'mb-2', modelDayTimeParameterDiv);
+        var parameterDiv = L.DomUtil.create('div', 'mb-2', this._raspPanel);
         this.parameterCategories = L.DomUtil.create('div', 'btn-group btn-group-toggle mb-1', parameterDiv);
         this.parameterCategories.setAttribute('data-toggle', 'buttons');
         var defaultCategory = cParameters[cDefaults.parameter].category;
@@ -180,14 +188,6 @@ L.Control.RASPControl = L.Control.extend({
         dateGoal.setHours(0,0,0,0);
         return date.valueOf() == dateGoal.valueOf();
     },
-    getCyclicNextIndex: function(select) {
-        var index = select.selectedIndex;
-        index++;
-        if (index > select.length - 1) {
-            index = 0;
-        }
-        return index;
-    },
     getModelAndDay: function() {
         var resultSplit = this.modelDaySelect.value.split("+");
         if (resultSplit.length == 1) {
@@ -262,6 +262,19 @@ L.Control.RASPControl = L.Control.extend({
             this.currentPopup.image.src = this.currentPopup.imageUrl;
         }
     },
+    timeChangeCyclic: function(direction) {
+        // direction = +1 -> forward, direction = -1 -> backward
+        var index = this.timeSelect.selectedIndex;
+        index += direction;
+        if (index > this.timeSelect.length - 1) {
+            index = 0;
+        }
+        if (index < 0) {
+            index = this.timeSelect.length - 1;
+        }
+        this.timeSelect.selectedIndex = index;
+        this.update();
+    },
     timeChange: function() {
         this.update();
     },
@@ -280,13 +293,6 @@ L.Control.RASPControl = L.Control.extend({
         var {model, day} = this.getModelAndDay();
         var time = this.timeSelect.value;
         var parameterKey = this.parameterSelect.value;
-        if (parameterKey == "pfd_tot") {
-            this.timeSelect.disabled = true;
-            this.disableOnMapClick();
-        } else {
-            this.timeSelect.disabled = false;
-            this.enableOnMapClick();
-        }
         var parameter = cParameters[parameterKey];
         var urls = this.getDataUrls(modelDir, parameterKey, time);
         this._updateTitle(urls.titleUrl, parameter.longname, day);
@@ -303,22 +309,17 @@ L.Control.RASPControl = L.Control.extend({
                 return response.json();
             })
             .then(titleJson => {
-                this._raspTitle.validText.innerHTML = titleJson["validLocal"] + " (" + titleJson["validZulu"] + ") " + titleJson["validDate"] + " [" + titleJson["fcstTime"] + "]";
                 var valid = this.isValid(titleJson["validDate"], day);
                 if (valid) {
-                    this._raspTitle.validInfo.classList.remove("text-danger");
-                    this._raspTitle.validInfo.classList.add("text-success");
+                    this.validWarning.style = "display: none";
                 } else {
-                    this._raspTitle.validInfo.classList.remove("text-success");
-                    this._raspTitle.validInfo.classList.add("text-danger");
+                    this.validWarning.style = "display: block";
+                    this.validWarning.innerHTML = dict["isNotValid"];
                 }
-                this._raspTitle.validInfo.title = valid ? dict["isValid"] : dict["isNotValid"];
             })
             .catch(err => {
-                this._raspTitle.validText.innerHTML = dict["isUnknownValid_text"];
-                this._raspTitle.validInfo.title = dict["isUnknownValid_tooltip"];
-                this._raspTitle.validInfo.classList.remove("text-success");
-                this._raspTitle.validInfo.classList.add("text-danger");
+                this.validWarning.style = "display: block";
+                this.validWarning.innerHTML = dict["isUnknownValid"];
             });
     },
     _updatePlot: function(geotiffUrls, parameter) {
@@ -341,17 +342,6 @@ L.Control.RASPControl = L.Control.extend({
     },
     setOpacity: function() {
         this._raspLayer.overlay.setOpacity(this.opacityLevel);
-    },
-    onMapClick: function() {
-        this.timeSelect.selectedIndex = this.getCyclicNextIndex(this.timeSelect);
-        this.update();
-    },
-    enableOnMapClick: function() {
-        this._map.off('click');
-        this._map.on('click', () => { this.onMapClick(); });
-    },
-    disableOnMapClick: function() {
-        this._map.off('click');
     },
     toggleSoundingsOrMeteograms: function() {
         if (this.soundingCheckbox.checked) {
