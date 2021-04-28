@@ -32,9 +32,9 @@
                 "zblcl",
                 "zblclmask",
                 "blcloudpct",
-                "cfracl",
-                "cfracm",
-                "cfrach",
+                // "cfracl",
+                // "cfracm",
+                // "cfrach",
 
                 // Wind
                 "sfcwind0",
