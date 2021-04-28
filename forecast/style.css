@@ -17,59 +17,6 @@ body {
     margin-left: 1ch;
 }
 
-/* Info modal (currently not used) */
-#infoModalBase {
-    display: none;
-    position: fixed;
-    z-index: 2000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-}
-#infoModal {
-    background-color: #fefefe;
-    margin-top: 10vh;
-    margin-left: auto;
-    margin-right: auto;
-    max-height: 80vh;
-    border: 1px solid #888;
-    width: 80%;
-    overflow-y: hidden;
-    display: flex;
-    flex-direction: column;
-}
-#infoModal > div {
-    padding: 10px;
-}
-#infoHeader {
-    background-color: #f0f0f0;
-    flex: 0 1 auto;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-}
-#infoHeaderContent {
-    flex: 1 1 auto;
-}
-#infoClose {
-    flex: 0 1 auto;
-    color: #aaaaaa;
-    font-size: 28px;
-    font-weight: bold;
-}
-#infoClose:hover,
-#infoClose:focus {
-    color: #000;
-    text-decoration: none;
-    cursor: pointer;
-}
-#infoBodyContent {
-    flex: 1 1 auto;
-    overflow-y: auto;
-}
-
 /* Loading animation */
 #loadingDiv {
     position: absolute;
@@ -99,9 +46,9 @@ body {
     flex-direction: row;
     justify-content: space-between;
 }
-@media (max-width: 80em) {
-    #top {
-        font-size: smaller;
+@media (max-width: 768px) {
+    #top h4 {
+        font-size: 1.2rem;
     }
 }
 #titleDiv {
@@ -125,7 +72,7 @@ body {
     margin: 2px;
     height: 50px;
 }
-@media (max-width: 60ch) {
+@media (max-width: 768px) {
     #logo {
         height: 35px;
     }
@@ -160,24 +107,98 @@ body {
     }
 }
 
-#sideScaleImg {
+#sideScaleDiv {
     flex: 1 1 auto;
-    width: auto;
+    width: 50px;
     height: 100%;
-    padding: 5px;
+    display: flex;
+    flex-direction: column;
 }
-#bottomScaleImg {
+
+#bottomScaleDiv {
+    flex: 0 1 auto;
     width: 100%;
-    height: auto;
+    height: 30px;
+    display: flex;
+    flex-direction: row;
+}
+
+.scaleUnit, .scaleMax, .scaleMin {
+    text-align: center;
     padding: 5px;
 }
+
+.scaleUnit {
+    font-weight: bold;
+}
+
+.sideScaleCanvasDiv {
+    flex: 1 1 auto;
+    position: relative;
+    min-height: 0; /* I hate CSS */
+    height: 100%;
+}
+
+.bottomScaleCanvasDiv {
+    flex: 1 1 auto;
+    position: relative;
+    width: 100%;
+}
+
+.sideScaleCanvasDiv > canvas, .bottomScaleCanvasDiv > canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.sideScaleIndicator {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+.sideScaleIndicatorMarker {
+    width: 100%;
+    height: 3px;
+    background-color: black;
+}
+
+.sideScaleIndicatorValue {
+    position: absolute;
+    right: 105%;
+    bottom: 0;
+    z-index: 1000;
+    background-color: rgba(255,255,255,0.9);
+}
+
+.bottomScaleIndicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+}
+
+.bottomScaleIndicatorMarker {
+    width: 3px;
+    height: 100%;
+    background-color: black;
+}
+
+.bottomScaleIndicatorValue {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    z-index: 1000;
+    background-color: rgba(255,255,255,0.9);
+}
+
 @media (orientation: landscape) {
-    #bottomScaleImg {
+    #bottomScaleDiv {
         display: none;
     }
 }
 @media (orientation: portrait) {
-    #sideScaleImg {
+    #sideScaleDiv {
         display: none;
     }
 }
@@ -223,7 +244,7 @@ body {
 }
 
 .leaflet-control-layers {
-    margin-right: 60px;
+    margin-right: 10px;
     max-width: 80ch;
 }
 .leaflet-control-layers-expanded {
@@ -232,34 +253,33 @@ body {
 .rasp-control .leaflet-control-layers-toggle {
     background-image: url(img/rasp_control.svg);
 }
-.rasp-control button {
-    width: 3em;
-    padding-left: 0px;
-    padding-right: 0px;
+.parameterCategoryIcon {
+    width: 36px;
+    height: 36px;
+    fill: currentColor;
 }
-#modelDayTimeParameterDiv > div {
-    margin-bottom: 4px;
+@media (max-width: 768px) {
+    .parameterCategoryIcon {
+        width: 24px;
+        height: 24px;
+    }
 }
-#parameterListDiv {
-    white-space: nowrap;
+@media (max-width: 576px) {
+    .parameterCategoryIcon {
+        width: 20px;
+        height: 20px;
+    }
 }
-#parameterSelect {
-    /* Mind the space occupied by the parameter toggle button */
-    width: calc(100% - 3em);
-}
-#parameterDiv > details {
+.parameterDiv > details {
     padding-top: 2px;
     padding-bottom: 2px;
     padding-left: 5px;
     padding-right: 5px;
 }
-#parameterDescription {
+.parameterDescription {
     display: inline-block;
     max-height: 8em;
     overflow-y: auto;
-}
-#markerDiv label {
-    display: inline-block;
 }
 .leaflet-container a.leaflet-control-collapse-button {
     position: absolute;
@@ -281,13 +301,22 @@ body {
     color: #999;
 }
 
+.leaflet-control-valueindicator {
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 0 5px;
+    margin: 0 !important;
+    color: #333;
+}
+
 .icon {
+    padding-left: 2px;
+    padding-right: 2px;
     width: 1em;
     height: 1em;
     vertical-align: middle;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 768px) {
     .leaflet-control-zoom {
         display: none;
     }

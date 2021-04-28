@@ -1,3 +1,4 @@
+<!doctype html>
 <html>
     <head>
         <meta charset="utf-8">
@@ -16,6 +17,10 @@
         <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
                 integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
                 crossorigin=""></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
         <!-- Own style with overwrites -->
         <link rel="stylesheet" href="style.css">
         <noscript>
@@ -23,15 +28,6 @@
         </noscript>
     </head>
     <body>
-        <!-- <div id="infoModalBase">
-             <div id="infoModal">
-             <div id="infoHeader">
-             <h1 id="infoHeaderContent"></h1>
-             <span id="infoClose">&times;</span>
-             </div>
-             <div id="infoBodyContent"></div>
-             </div>
-             </div> -->
         <div id="loadingDiv">
             <div id="loadingAnimation"></div>
         </div>
@@ -43,24 +39,17 @@
             <a href="/">Info</a>
         </div>
         <div id="top">
-            <div id="titleDiv">
-                <h2 id="titleParameter"></h2>
-                <h3><span id="titleValid"></span> <span id="titleValidSymbol"></span></h3>
-                <h6 id="titleDrJack"></h6>
-                <!-- <img id='titleImg' alt='Parameter Information'> -->
-            </div>
+            <div id="titleDiv"></div>
             <div id="logoDiv">
                 <a href="/"><img id='logo' src="/logo.svg" alt='aufwin.de - Logo'></a>
             </div>
         </div>
         <div id='mapAndScale'>
             <div id='map'></div>
-            <img id='sideScaleImg' alt='Side Scale'>
+            <div id="sideScaleDiv"></div>
         </div>
-        <img id='bottomScaleImg' alt='Bottom Scale'>
+        <div id="bottomScaleDiv"></div>
 
-        <script src="config.js"></script>
-        <script src="app.js"></script>
-        <!-- <script src="infomodal.js"></script> -->
+        <script src="bundle.js"></script>
     </body>
 </html>
