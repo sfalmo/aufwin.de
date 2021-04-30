@@ -21,7 +21,7 @@ L.RaspLayer = L.Layer.extend({
         this.valueIndicator = valueIndicator();
         this.valueIndicator.addTo(this._map);
         this._map.on('mousemove', this._onMouseMove, this);
-        return this.valueIndicator;
+        return this;
     },
     onRemove: function() {
         this._map.off('mousemove', this._onMouseMove);

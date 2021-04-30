@@ -28,7 +28,7 @@ var dict = {
     "Soundings": "Temps",
     "Meteograms": "Meteogramme",
     "Show in separate window": "Separat anzeigen",
-    "isNotValid": "Daten veraltet. Bitte Zeitplan der Simulationsläufe beachten.",
+    "isNotValid": "Daten veraltet. Bitte <a href='/news.html#schedule' target='_blank'>Zeitplan der Simulationsläufe</a> beachten.",
     "isUnknownValid": "Gültigkeits-Info nicht gefunden",
     "Today": "Heute",
     "Tomorrow": "Morgen",

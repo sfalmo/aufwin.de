@@ -28,7 +28,7 @@ var dict = {
     "Soundings": "Soundings",
     "Meteograms": "Meteograms",
     "Show in separate window": "Show in separate window",
-    "isNotValid": "Old data. Please note simulation run schedule.",
+    "isNotValid": "Old data. Please refer to the <a href='/news.html#schedule' target='_blank'>simulation run schedule</a>.",
     "isUnknownValid": "Validity info not found",
     "Today": "Today",
     "Tomorrow": "Tomorrow",

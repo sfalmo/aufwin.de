@@ -32,9 +32,9 @@
                 "zblcl",
                 "zblclmask",
                 "blcloudpct",
-                // "cfracl",
-                // "cfracm",
-                // "cfrach",
+                "cfracl",
+                "cfracm",
+                "cfrach",
 
                 // Wind
                 "sfcwind0",
@@ -281,13 +281,36 @@
 
     var parseGeoraster = /*@__PURE__*/getDefaultExportFromCjs(georaster_browser_bundle_min);
 
+    L.Control.ValidIndicator = L.Control.extend({
+        options: {
+            position: 'topright',
+            emptyString: '???',
+        },
+        onAdd: function (map) {
+            this._container = L.DomUtil.create('div', 'leaflet-control-indicator');
+            L.DomEvent.disableClickPropagation(this._container);
+            this._container.innerHTML = this.options.emptyString;
+            return this._container;
+        },
+        onRemove: function (map) {
+            // Nothing to do
+        },
+        update: function (validInfoText) {
+            this._container.innerHTML = validInfoText;
+        }
+    });
+
+    function validIndicator (options) {
+        return new L.Control.ValidIndicator(options);
+    }
+
     L.Control.ValueIndicator = L.Control.extend({
         options: {
             position: 'topleft',
             emptyString: '-',
         },
         onAdd: function (map) {
-            this._container = L.DomUtil.create('div', 'leaflet-control-valueindicator');
+            this._container = L.DomUtil.create('div', 'leaflet-control-indicator');
             L.DomEvent.disableClickPropagation(this._container);
             this._container.innerHTML = this.options.emptyString;
             return this._container;
@@ -2403,7 +2426,7 @@ ${ids.map(id => `          float ${id}_value = texture2D(u_texture_${id}, v_texC
             this.valueIndicator = valueIndicator();
             this.valueIndicator.addTo(this._map);
             this._map.on('mousemove', this._onMouseMove, this);
-            return this.valueIndicator;
+            return this;
         },
         onRemove: function() {
             this._map.off('mousemove', this._onMouseMove);
@@ -2500,6 +2523,8 @@ ${ids.map(id => `          float ${id}_value = texture2D(u_texture_${id}, v_texC
             this._initTitle();
             this._initPanel();
             this._initRaspLayer();
+
+            this.validIndicator = validIndicator().addTo(map);
 
             this._map.on('popupclose', (e) => {
                 this.currentPopup = null;
@@ -2787,8 +2812,9 @@ ${ids.map(id => `          float ${id}_value = texture2D(u_texture_${id}, v_texC
                 .then(response => {
                     return response.json();
                 })
-                .then(titleJson => {
-                    var valid = this.isValid(titleJson["validDate"], day);
+                .then(validJson => {
+                    this.validIndicator.update(`${validJson["validDate"]} ${validJson["validLocal"]} (${validJson["validZulu"]})`);
+                    var valid = this.isValid(validJson["validDate"], day);
                     if (valid) {
                         this.validWarning.style = "display: none";
                     } else {

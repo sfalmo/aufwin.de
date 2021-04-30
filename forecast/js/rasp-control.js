@@ -1,6 +1,7 @@
 import parseGeoraster from 'georaster';
 
 import { cModels , cCategories , cParameters , cSoundings , cMeteograms , cLayers , cDefaults } from '../config.js';
+import validIndicator from './valid-indicator.js';
 import raspLayer from './rasp-layer.js';
 
 L.Control.RASPControl = L.Control.extend({
@@ -19,6 +20,8 @@ L.Control.RASPControl = L.Control.extend({
         this._initTitle();
         this._initPanel();
         this._initRaspLayer();
+
+        this.validIndicator = validIndicator().addTo(map);
 
         this._map.on('popupclose', (e) => {
             this.currentPopup = null;
@@ -308,8 +311,9 @@ L.Control.RASPControl = L.Control.extend({
             .then(response => {
                 return response.json();
             })
-            .then(titleJson => {
-                var valid = this.isValid(titleJson["validDate"], day);
+            .then(validJson => {
+                this.validIndicator.update(`${validJson["validDate"]} ${validJson["validLocal"]} (${validJson["validZulu"]})`);
+                var valid = this.isValid(validJson["validDate"], day);
                 if (valid) {
                     this.validWarning.style = "display: none";
                 } else {

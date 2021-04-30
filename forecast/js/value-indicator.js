@@ -4,7 +4,7 @@ L.Control.ValueIndicator = L.Control.extend({
         emptyString: '-',
     },
     onAdd: function (map) {
-        this._container = L.DomUtil.create('div', 'leaflet-control-valueindicator');
+        this._container = L.DomUtil.create('div', 'leaflet-control-indicator');
         L.DomEvent.disableClickPropagation(this._container);
         this._container.innerHTML = this.options.emptyString;
         return this._container;
