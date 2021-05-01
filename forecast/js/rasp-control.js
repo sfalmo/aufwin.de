@@ -5,7 +5,7 @@ import validIndicator from './valid-indicator.js';
 import raspLayer from './rasp-layer.js';
 
 L.Control.RASPControl = L.Control.extend({
-    imageOverlayLoadingAnimation: document.getElementById("loadingDiv"),
+    loadingAnimation: document.getElementById("loadingDiv"),
     meteogramIcon: L.icon({
         iconUrl: cDefaults.meteogramMarker,
         iconSize: [cDefaults.markerSize, cDefaults.markerSize]
@@ -15,11 +15,14 @@ L.Control.RASPControl = L.Control.extend({
         iconSize: [cDefaults.markerSize, cDefaults.markerSize]
     }),
     onAdd: function(map) {
-        this.imageOverlayLoadingAnimation.style.visibility = 'hidden';
+        this.loadingAnimation.style.visibility = 'hidden';
         this._map = map;
         this._initTitle();
         this._initPanel();
         this._initRaspLayer();
+
+        this.loadingTitle = false;
+        this.loadingPlot = false;
 
         this.validIndicator = validIndicator().addTo(map);
 
@@ -291,6 +294,14 @@ L.Control.RASPControl = L.Control.extend({
         this.parameterDescription.innerHTML = cParameters[this.parameterSelect.value].description;
         this.update();
     },
+    _loading: function() {
+        return this.loadingTitle || this.loadingPlot || (this.currentPopup && !this.currentPopup.image.complete);
+    },
+    _hideLoadingAnimationMaybe: function() {
+        if (!this._loading()) {
+            this.loadingAnimation.style.visibility = "hidden";
+        }
+    },
     update: function() {
         var modelDir = this.modelDaySelect.value;
         var {model, day} = this.getModelAndDay();
@@ -298,20 +309,26 @@ L.Control.RASPControl = L.Control.extend({
         var parameterKey = this.parameterSelect.value;
         var parameter = cParameters[parameterKey];
         var urls = this.getDataUrls(modelDir, parameterKey, time);
-        this._updateTitle(urls.titleUrl, parameter.longname, day);
         this._updatePlot(urls.geotiffUrls, parameter);
         if (this.currentPopup && this.currentPopup.type == "sounding") {
             this.currentPopup.imageUrl = cDefaults.forecastServerRoot + "/" + modelDir + "/sounding" + this.currentPopup.key + ".curr." + time + "lst.d2.png";
             this.currentPopup.image.src = this.currentPopup.imageUrl;
         }
+        this._updateTitle(urls.titleUrl, parameter.longname, day);
+        setTimeout(() => {
+            if (this._loading()) {
+                this.loadingAnimation.style.visibility = "visible";
+            }
+        }, cDefaults.loadingAnimationDelay);
     },
     _updateTitle: function(titleUrl, parameterLongname, day) {
-        this._raspTitle.parameter.innerHTML = parameterLongname;
+        this.loadingTitle = true;
         fetch(titleUrl)
             .then(response => {
                 return response.json();
             })
             .then(validJson => {
+                this._raspTitle.parameter.innerHTML = parameterLongname;
                 this.validIndicator.update(`${validJson["validDate"]} ${validJson["validLocal"]} (${validJson["validZulu"]})`);
                 var valid = this.isValid(validJson["validDate"], day);
                 if (valid) {
@@ -320,13 +337,20 @@ L.Control.RASPControl = L.Control.extend({
                     this.validWarning.style = "display: block";
                     this.validWarning.innerHTML = dict["isNotValid"];
                 }
+                this.loadingTitle = false;
+                this._hideLoadingAnimationMaybe();
             })
             .catch(err => {
+                this._raspTitle.parameter.innerHTML = parameterLongname;
+                this.validIndicator.update("???");
                 this.validWarning.style = "display: block";
                 this.validWarning.innerHTML = dict["isUnknownValid"];
+                this.loadingTitle = false;
+                this._hideLoadingAnimationMaybe();
             });
     },
     _updatePlot: function(geotiffUrls, parameter) {
+        this.loadingPlot = true;
         Promise.all(geotiffUrls.map(url => fetch(url)))
             .then(responses => {
                 return Promise.all(responses.map(response => response.arrayBuffer()));
@@ -334,7 +358,16 @@ L.Control.RASPControl = L.Control.extend({
             .then(buffers => {
                 return Promise.all(buffers.map(parseGeoraster));
             })
-            .then(georasters => this._raspLayer.update(georasters, parameter));
+            .then(georasters => {
+                this._raspLayer.update(georasters, parameter);
+                this.loadingPlot = false;
+                this._hideLoadingAnimationMaybe();
+            })
+            .catch(err => {
+                // TODO: handle missing plot
+                this.loadingPlot = false;
+                this._hideLoadingAnimationMaybe();
+            });
     },
     opacityUp: function() {
         this.opacityLevel = Math.min(this.opacityLevel + this.opacityDelta, 1);
@@ -375,7 +408,7 @@ L.Control.RASPControl = L.Control.extend({
         popupContent.appendChild(popupLink);
         popupContent.appendChild(this.currentPopup.image);
         this.currentPopup.popup.setContent(popupContent);
-        this.imageOverlayLoadingAnimation.style.visibility = "hidden";
+        this.loadingAnimation.style.visibility = "hidden";
     },
     getSoundingMarkers: function(modelKey) {
         var markers = [];
@@ -401,7 +434,7 @@ L.Control.RASPControl = L.Control.extend({
                         this.currentPopup.image.src = this.currentPopup.imageUrl;
                         setTimeout(() => {
                             if (!this.currentPopup.image.complete) {
-                                this.imageOverlayLoadingAnimation.style.visibility = "visible";
+                                this.loadingAnimation.style.visibility = "visible";
                             }
                         }, cDefaults.loadingAnimationDelay);
                     })
@@ -432,7 +465,7 @@ L.Control.RASPControl = L.Control.extend({
                         this.currentPopup.image.src = this.currentPopup.imageUrl;
                         setTimeout(() => {
                             if (!this.currentPopup.image.complete) {
-                                this.imageOverlayLoadingAnimation.style.visibility = "visible";
+                                this.loadingAnimation.style.visibility = "visible";
                             }
                         }, cDefaults.loadingAnimationDelay);
                     })
