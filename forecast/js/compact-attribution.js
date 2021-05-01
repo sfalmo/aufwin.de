@@ -16,15 +16,15 @@ L.Control.Attribution.Compact = L.Control.Attribution.extend({
         label.classList.add('leaflet-compact-attribution-label');
         parent.appendChild(label);
         // initial setup for map load
-        if (map._container.offsetWidth <= 700) {
+        if (window.innerWidth < 700 || window.matchMedia("(orientation: portrait)").matches) {
             L.DomUtil.addClass(this._container, 'leaflet-compact-attribution');
         }
         // update on map resize
         map.on('resize', function() {
-            if (map._container.offsetWidth > 700) {
-                L.DomUtil.removeClass(this._container, 'leaflet-compact-attribution');
-            } else {
+            if (window.innerWidth < 700 || window.matchMedia("(orientation: portrait)").matches) {
                 L.DomUtil.addClass(this._container, 'leaflet-compact-attribution');
+            } else {
+                L.DomUtil.removeClass(this._container, 'leaflet-compact-attribution');
             }
         }, this);
         return this;
