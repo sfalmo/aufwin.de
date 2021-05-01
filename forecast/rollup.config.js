@@ -1,4 +1,5 @@
 import resolve from '@rollup/plugin-node-resolve';
+import { babel } from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import { terser } from 'rollup-plugin-terser';
 import analyze from 'rollup-plugin-analyzer';
@@ -19,6 +20,7 @@ export default {
             browser: true
         }),
         commonjs(),
+        babel({ babelHelpers: 'bundled' }),
         production && terser(),
         analyze()
 	  ]

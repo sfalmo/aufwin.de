@@ -10,6 +10,7 @@
   "author": "Florian Sammüller",
   "license": "ISC",
   "devDependencies": {
+    "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-commonjs": "^18.0.0",
     "@rollup/plugin-node-resolve": "^11.2.1",
     "georaster": "^1.5.4",
