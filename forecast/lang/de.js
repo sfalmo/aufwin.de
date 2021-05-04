@@ -51,6 +51,8 @@ var dict = {
     "wstar_bsratio.description": "Zusammengesetzter Plot aus Thermikstärke und Auftrieb-/Scher-Verhältnis. Bereiche mit geringem Auftrieb-/Scher-Verhältnis sind hell (3 < A/S < 6) bzw. dunkel (A/S < 3) schattiert dargestellt.",
     "hglider.longname": "Nutzbare Thermikhöhe (MSL)",
     "hglider.description": "Nutzbare Thermikhöhe, d.h. das Minimum aus Höhe kritischer Aufwindstärke, Cumulus-Wolkenbasis und Überentwicklungs-Wolkenbasis.",
+    "dglider.longname": "Nutzbare Thermikhöhe (AGL)",
+    "dglider.description": "Nutzbare Thermikhöhe (MSL) minus Geländehöhe.",
     "hwcrit.longname": "Höhe kritischer Aufwindstärke (MSL)",
     "hwcrit.description": "Höhe, in der die durchschnittliche Thermikstärke unter 225 ft/min (= 1,14 m/s) fällt, was die nutzbare Thermikhöhe abschätzt. Bei konvektiver Wolkenbildung ist diese allerdings durch die Wolkenbasis limitiert.",
     "dwcrit.longname": "Höhe kritischer Aufwindstärke (AGL)",

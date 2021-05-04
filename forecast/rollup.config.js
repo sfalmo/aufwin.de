@@ -20,7 +20,9 @@ export default {
             browser: true
         }),
         commonjs(),
-        babel({ babelHelpers: 'bundled' }),
+        babel({
+            babelHelpers: 'bundled'
+        }),
         production && terser(),
         analyze()
 	  ]

@@ -51,6 +51,8 @@ var dict = {
     "wstar_bsratio.description": "Compound plot of Thermal Updraft Velocity and Buoyancy/Shear Ratio. Regions with small Buoyancy/Shear Ratio are marked by a light (3 < B/S < 6) or dark (B/S < 3) shadow.",
     "hglider.longname": "Thermalling Height",
     "hglider.description": "Usable thermalling height, calculated as the minimum of Height of Critical Updraft Strength, Cumulus Cloudbase and Overdevelopment Cloudbase.",
+    "dglider.longname": "Thermalling Depth",
+    "dglider.description": "Thermalling Height compensated for topography.",
     "hwcrit.longname": "Height of Critical Updraft Strength",
     "hwcrit.description": "Height at which the average dry updraft strength drops below 225 ft/min (= 1,14 m/s) and thus giving an estimate of the usable thermalling height. In the presence of clouds the latter may instead be limited by the cloud base.",
     "dwcrit.longname": "Depth of Critical Updraft Strength",
