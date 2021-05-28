@@ -1,4 +1,4 @@
-import * as plotty from 'plotty';
+import * as plotty from '../plotty/src/plotty.js';
 
 L.RaspRendererPlotty = L.Class.extend({
     options: {
@@ -45,11 +45,11 @@ L.RaspRendererPlotty = L.Class.extend({
             clampLow: true,
             clampHigh: true,
             noDataValue: -999999,
-            colorScale: 'rasp',
+            colorScale: 'rasp'
         });
     },
     render: function(georaster, options) {
-        this._updateDataset(georaster, options.append);
+        this._updateDataset(georaster);
         this.plottyplot.setDomain(options.domain);
         this.plottyplot.setColorScale(options.colorscale ? options.colorscale : 'rasp'); // Default to rasp
         this.plottyplot.render();
@@ -60,10 +60,7 @@ L.RaspRendererPlotty = L.Class.extend({
         }
         this.targetCanvas.getContext('2d').drawImage(this.workingCanvas, 0, 0);
     },
-    _updateDataset: function(georaster, append) {
-        if (this.plottyplot.datasetAvailable('dataset')) {
-            this.plottyplot.removeDataset('dataset');
-        }
+    _updateDataset: function(georaster) {
         // It seems like the data has to be shifted down by 1 pixel, but I do not know why
         // This is a plotting issue, the data in georaster is definitely correct (checked with QGIS)
         this.data = new Float32Array(georaster.width * georaster.height);
@@ -75,7 +72,8 @@ L.RaspRendererPlotty = L.Class.extend({
                 this.data[i * georaster.width + j] = georaster.values[0][i-1][j];
             }
         }
-        this.plottyplot.addDataset('dataset', this.data, georaster.width, georaster.height);
+        this.plottyplot.setNoDataValue(georaster.noDataValue);
+        this.plottyplot.setData(this.data, georaster.width, georaster.height);
     },
     _updateScale: function(domain, unit) {
         this._updateColorscale(domain, unit);
@@ -121,12 +119,12 @@ L.RaspRendererPlotty = L.Class.extend({
         this.sideScaleIndicator.style.visibility = 'hidden';
         this.bottomScaleIndicator.style.visibility = 'hidden';
     },
-    quantize: function(value) {
-        this.plottyplot.setExpression(`floor(dataset / ${value} + 0.5) * ${value}`);
-    },
-    unquantize: function() {
-        this.plottyplot.setExpression("");
-    }
+    // quantize: function(value) {
+    //     this.plottyplot.setExpression(`floor(dataset / ${value} + 0.5) * ${value}`);
+    // },
+    // unquantize: function() {
+    //     this.plottyplot.setExpression("");
+    // }
 });
 
 export default function(canvas, options) {

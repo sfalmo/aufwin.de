@@ -48,7 +48,7 @@ L.Control.RASPControl = L.Control.extend({
         this.modelDaySelect = L.DomUtil.create('select', 'custom-select w-auto', modelDayGroup);
         this.modelDaySelect.onchange = () => { this.modelDayChange(); };
         this.modelDaySelect.title = dict["modelDaySelect_title"];
-        var timeGroup = L.DomUtil.create('div', 'input-group input-group-sm mx-1', modelDayTimeDiv);
+        var timeGroup = L.DomUtil.create('div', 'input-group input-group-sm mx-1 flex-nowrap', modelDayTimeDiv);
         var timePrev = L.DomUtil.create('div', 'input-group-prepend', timeGroup);
         this.timePrevButton = L.DomUtil.create('button', 'btn btn-outline-secondary', timePrev);
         this.timePrevButton.innerHTML = '◄';
