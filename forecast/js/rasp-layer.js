@@ -76,14 +76,11 @@ L.RaspLayer = L.Layer.extend({
         var values = [];
         if (x >= 0 && x < this.georasters[0].width && y >= 0 && y < this.georasters[0].height) { // we are inside the domain
             this.georasters.forEach((georaster, i) => {
-                var value = georaster.values[0][y][x].toFixed(0);
-                if (value != georaster.noDataValue) {
-                    values[i] = value;
-                }
+                values[i] = georaster.values[0][y][x].toFixed(0);
             });
         }
         var valueIndicatorText = "-";
-        if (values.length != 0) {
+        if (values.length != 0 && values[0] != this.georasters[0].noDataValue) {
             valueIndicatorText = "";
             values.forEach((value, i) => {
                 if (i != 0) {
@@ -99,7 +96,9 @@ L.RaspLayer = L.Layer.extend({
         this.valueIndicator.update(valueIndicatorText);
     },
     _onMouseMove: function(e) {
-        this._updateValueIndicator(e.latlng.lat, e.latlng.lng);
+        if (this.georasters) {
+            this._updateValueIndicator(e.latlng.lat, e.latlng.lng);
+        }
     }
 });
 
