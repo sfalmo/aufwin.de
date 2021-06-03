@@ -111,6 +111,8 @@ var dict = {
     "cfracm.description": "Bewölkungsgrad für Wolken in mittlerer Höhe zwischen 2000m AGL und 6000m AGL.",
     "cfrach.longname": "Bewölkungsgrad - Hohe Wolken",
     "cfrach.description": "Bewölkungsgrad für hohe Wolken über 6000m AGL.",
+    "clouds.longname": "Bewölkungsgrad - Gesamt",
+    "clouds.description": "Komposit aus tiefer (rot), mittlerer (grün) und hoher (blau) Bewölkung",
     "rain1.longname": "Regenmenge",
     "rain1.description": "Stündliche Niederschlagsmenge.",
     "cape.longname": "CAPE",
@@ -126,5 +128,5 @@ var dict = {
     "press500.longname": "Vertikalbewegung in 500mb",
     "press500.description": "Windfähnchen, die Windrichtung- und geschwindigkeit in einer Höhe von 500mb zeigen, sowie Vertikalbewegung in dieser Höhe.",
     "pfd_tot.longname": "Potentielle Flugdistanz",
-    "pfd_tot.description": "Abschätzung der potentielle Flugdistanz mit der Polare eines Discus mit 100kg Ballast."
+    "pfd_tot.description": "Abschätzung der potentiellen Flugdistanz mit der Polare eines Discus mit 100kg Ballast."
 };
