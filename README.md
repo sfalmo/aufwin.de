@@ -12,8 +12,8 @@
 
 ## How do I get RASP forecasts?
 
-This website is a frontend for visualizing meteorological data obtained by running Dr. John W. "DrJack" Glendening's Regional Atmospheric Soaring Prediction (RASP) program.
-To get started with RASP, check out [the official website](http://www.drjack.info/RASP/index.html), [the RASP forum](http://www.drjack.info/cgi-bin/rasp-forum.cgi) and [this repository](https://github.com/sfalmo/raspTIR) which contains the config files for RASP runs on [aufwin.de](https://aufwin.de).
+This web app is a frontend for visualizing meteorological data obtained by running Dr. John W. "DrJack" Glendening's Regional Atmospheric Soaring Prediction (RASP) program.
+To get started with RASP, check out [the official website](http://www.drjack.info/RASP/index.html), [the RASP forum](http://www.drjack.info/cgi-bin/rasp-forum.cgi) and [this repository](https://github.com/sfalmo/rasp-from-scratch) which contains the config files for RASP runs on [aufwin.de](https://aufwin.de).
 
 ## Forecast Viewer
 

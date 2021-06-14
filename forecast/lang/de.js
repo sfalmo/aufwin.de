@@ -1,11 +1,9 @@
 var lang = "de";
 
 var dict = {
-    "HTMLTitle": "aufwin.de - RASP für Südostdeutschland",
-    "PageNotFound": "Seite nicht gefunden",
-    "LegalNotice": "Impressum/Datenschutz",
-    "FAQ": "FAQ",
-    // "modelDaySelect_title": "Modell und Tag wählen",
+    "forecastTitle": "aufwin.de | Vorhersage",
+    "legalNotice": "Impressum",
+    "privacyPolicy": "Datenschutz",
     "modelDaySelect_title": "Tag wählen",
     "timeSelect_title": "Zeit wählen",
     "parameterSelect_title": "Parameter wählen",

@@ -56,9 +56,9 @@ L.RaspLayer = L.Layer.extend({
             }
             if (parameter.composite.type == "clouds") {
                 this.plottyRenderer.render(georasters[0], {domain: this.domains[0], unit: this.units[0], colorscale: 'clouds', dummy: true});
-                this.plottyRenderer.render(georasters[0], {domain: this.domains[0], unit: this.units[0], colorscale: 'clouds_red', append: true});
-                this.plottyRenderer.render(georasters[1], {domain: this.domains[1], unit: this.units[1], colorscale: 'clouds_green', append: true});
-                this.plottyRenderer.render(georasters[2], {domain: this.domains[2], unit: this.units[2], colorscale: 'clouds_blue', append: true});
+                this.plottyRenderer.render(georasters[0], {domain: this.domains[0], unit: this.units[0], colorscale: 'clouds_low', append: true});
+                this.plottyRenderer.render(georasters[1], {domain: this.domains[1], unit: this.units[1], colorscale: 'clouds_mid', append: true});
+                this.plottyRenderer.render(georasters[2], {domain: this.domains[2], unit: this.units[2], colorscale: 'clouds_high', append: true});
             }
             if (parameter.composite.type == "press") {
                 this.plottyRenderer.render(georasters[0], {domain: this.domains[0], unit: this.units[0]});

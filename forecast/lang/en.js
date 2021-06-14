@@ -1,16 +1,14 @@
 var lang = "en";
 
 var dict = {
-    "HTMLTitle": "aufwin.de - RASP for South-East Germany",
-    "PageNotFound": "Page not found",
-    "LegalNotice": "Legal Notice/Privacy Policy",
-    "FAQ": "FAQ",
-    // "modelDaySelect_title": "Select model and day",
+    "forecastTitle": "aufwin.de | Forecast",
+    "legalNotice": "Legal Notice",
+    "privacyPolicy": "Privacy Policy",
     "modelDaySelect_title": "Select day",
     "timeSelect_title": "Select time",
     "parameterSelect_title": "Select parameter",
     "parameterDetails_title": "Show details of the selected parameter",
-    "parameterDetails_summary": "Parameter Details",
+    "parameterDetails_summary": "Details",
     "parameterCategory_thermal_title": "Thermals and Boundary Layer",
     "parameterCategory_cloud_title": "Clouds",
     "parameterCategory_wind_title": "Wind",
