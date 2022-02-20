@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="de">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="author" content="Florian Sammüller">
+        <meta name="description" content="Detailliertes Segelflugwetter für Bayern, Thüringen, Sachsen und West-Tschechien mit RASP BLIPMAPS.">
+        <meta name="keywords" content="Aufwinde, aufwinde, RASP, BLIPMAPS, Segelflugwetter, Segelflugwetterbericht, Segelfliegen, DWD, TopMeteo, SkySight, Wettervorhersage, Thermik, Streckenflug, soaring, gliding, weather, forecast">
+        <title>aufwin.de - Segelflugwettervorhersage mit RASP</title>
+        <link rel="shortcut icon" type="image/x-icon" href="/favicon.svg">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <nav class="navbar sticky-top navbar-expand-sm navbar-light bg-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/"><img src="/favicon.svg" width="30" height="30" alt=""></a>
+                <div class="nav-item ms-auto me-2 d-grid order-sm-last" id="toForecast">
+                    <a class="btn btn-primary shadow" href="/forecast/">zur Vorhersage</a>
+                </div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/news.html">News</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/impressum.html">Impressum</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/datenschutz.html">Datenschutz</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="jumbotron jumbotron-fluid d-flex align-items-center" style="min-height: 60vh; background: url(img/banner.jpg) no-repeat center right; background-size: cover;">
+            <div class="container">
+                <img src="/logo.svg">
+                <p id="banner" class="lead">Segelflugwettervorhersage mit RASP</p>
+                <a class="btn btn-lg btn-primary shadow-lg" href="/forecast/">zur Vorhersage</a>
+            </div>
+        </div>
+        <script>
+         if (
+             "IntersectionObserver" in window &&
+             "IntersectionObserverEntry" in window &&
+             "intersectionRatio" in window.IntersectionObserverEntry.prototype
+         ) {
+             var toForecastNavbar = document.getElementById("toForecast");
+             var banner = document.getElementById("banner");
+             var observer = new IntersectionObserver(entries => {
+                 if (entries[0].isIntersecting) {
+                     toForecastNavbar.classList.add("d-none");
+                 } else {
+                     toForecastNavbar.classList.remove("d-none");
+                 }
+             });
+             observer.observe(banner);
+         }
+        </script>
+
+        <div role="main" class="container">
+            <h2>FAQ</h2>
+            <h4>Was ist RASP?</h4>
+            <p>
+                Die hier gezeigten Wettervorhersagen werden mit <a href="http://www.drjack.info" target="_blank">Dr. John W. "DrJack" Glendening's</a> <a href="http://www.drjack.info/RASP/index.html" target="_blank">Regional Atmospheric Soaring Prediction (RASP)</a> erstellt. RASP ist ein Wettersimulations-Tool, welches auf dem <a href="https://www.mmm.ucar.edu/weather-research-and-forecasting-model" target="_blank">Weather Research and Forecasting Model (WRF)</a> basiert und meteorologische Parameter berechnet und darstellt, die von besonderem Interesse für den Segelflug sind. Insbesondere produziert eine RASP-Vorhersage Boundary Layer Information Prediction Maps (BLIPMAPS), d.h. Karten mit besonders vielen Informationen über den untersten Teil der Atmosphäre (die sog. Peplosphäre bzw. Grenzschicht), in der turbulente Durchmischung durch Interaktion mit der Erdoberfläche stattfindet. RASP wurde Anfang der 2000er-Jahre entwickelt und wird seitdem in vielen Regionen zur Segelflugwettervorhersage genutzt.
+            </p>
+            <h4>Wie funktioniert die Segelflugwettervorhersage mit RASP?</h4>
+            <p>
+                Mit RASP wird das Wettergeschehen für einen Vorhersagetag nicht etwa nur anhand bereits verfügbarer Modelldaten ausgewertet. Stattdessen führt RASP selbst eine explizite numerische Simulation der physikalischen Bewegungsgleichungen der Atmosphäre durch.<br>
+                Vor dem Start der eigentlichen Simulation werden die aktuellen Wetterdaten vom <a href="https://www.ncdc.noaa.gov/data-access/model-data/model-datasets/global-forcast-system-gfs" target="_blank">Global Forecast System (GFS)</a> bezogen. Mit diesen Daten wird dann ein hochauflösendes Modellgitter auf der zu betrachtenden Region sowie ein gröberes Gitter auf einem größeren umliegenden Bereich initialisiert und die Simulation gestartet. In dieser wird die Zeitentwicklung einer Vielzahl von meteorologischen Parametern auf jedem Gitterpunkt des inneren und äußeren Bereiches berechnet, wofür RASP grundlegende physikalischen Modelle und Gleichungen nutzt, welche die Dynamik dieser Parameter beschreiben.<br>
+                Im Laufe der Simulation wird der Rand der äußeren Domäne mit Daten des GFS-Wettermodells gespeist. Die Randbedingungen des inneren Gitters sind wiederum durch das umliegende äußere bestimmt. Durch diese Kopplung ist eine präzise Simulation der hochauflösenden inneren Region möglich, ohne dass sich dabei die Ungenauigkeiten der grob aufgelösten Anfangs- und Randdaten direkt fortpflanzen.<br>
+                In regelmäßigen Zeitabständen werden verschiedene meteorologische Parameter berechnet und ausgegeben. Diese werden nach der Simulation geplottet und auf der Karte dargestellt. Zusätzlich werden für einige Gitterpunkte Vertikalprofile (Temps) und Meteogramme erstellt, die weitere Informationen über den Zustand der unteren Atmosphäre im Tagesverlauf an den jeweiligen Orten geben.
+            </p>
+            <h4>Wie genau sind die Resultate?</h4>
+            <p>
+                Verglichen mit den meisten anderen bekannten Wettermodellen ist das Gitter, auf dem die physikalischen Bewegungsgleichungen gelöst werden, wesentlich hochauflösender. Außerdem werden zur Modellierung des Geländes Daten der <a href="https://www2.jpl.nasa.gov/srtm/" target="_blank">Shuttle Radar Topography Mission (SRTM)</a> genutzt. Durch diese Maßnahmen:
+                <ul>
+                    <li>werden die numerischen Fehler der Simulation kleiner.</li>
+                    <li>können manche meteorologischen Phänomene explizit berechnet werden, die in Simulationen mit gröberen Gittern nicht zugänglich sind.</li>
+                    <li>wird der Einfluss kleinskaliger topographischer Gegebenheiten (kleine Städte, Berge/Täler, Seen, etc.) sichtbar.</li>
+                </ul>
+                Besonders die letzten Punkte verdeutlichen den Nutzen für den Segelflug, da thermische Hotspots, Hangwinde, Konvergenzlinien, Leewellen, etc. direkt in den Simulationsdaten auftauchen.<br>
+                Trotz allem ist die Genauigkeit natürlich auch durch die gegebenen Anfangs- und Randbedingungen limitiert. Wenn das beobachtete Wetter stark vom GFS-Modell abweicht, könnten die Vorhersagen ungenau sein.<br>
+                <strong>Tipp:</strong> Einige der vorhergesagten Parameter (z.B. Oberflächentemperatur, Taupunkt oder Bewölkung) können einfach mit den aktuellen Gegebenheiten verglichen werden und dienen damit als Genauigkeitskriterium der Vorhersage. Bei starken Abweichungen in diesen Parametern sind auch Fehler in den anderen zu erwarten.
+            </p>
+            <h4>Gibt es RASP-Vorhersagen auch für andere Regionen?</h4>
+            <p>
+                Ja, z.B. <a href="https://blipmaps.nl" target="_blank">blipmaps.nl</a> für BeNeLux und Nordwestdeutschland, <a href="http://46.243.114.203/drjack/nord_de.html" target="_blank">diese Seite</a> für Norddeutschland, <a href="https://www.fcst.pl" target="_blank">fcst.pl</a> für Polen und noch viele weitere außerhalb Mitteleuropas. Lange Zeit hat auch <a href="http://rasp.linta.de" target="_blank">rasp.linta.de</a> Vorhersagen für ganz Deutschland produziert, aber momentan scheint diese Seite inaktiv zu sein.<br>
+                Die Durchführung eines RASP-Simulationslaufes erfordert einiges an Rechenleistung. Diese gibt es nicht umsonst, was die Auflösung und Größe von Regionen limitiert. Falls Interesse an größeren oder zusätzlichen Regionen, mehr Vorhersagetagen oder häufigeren Simulationsläufen pro Tag besteht, freuen wir uns über <a href="/impressum.html">Unterstützung</a>.
+            </p>
+        </div>
+
+        <hr>
+
+        <div class="text-center">
+            <p>© 2022 aufwin.de | <a href="/impressum.html">Impressum</a> | <a href="/datenschutz.html">Datenschutz</a></p>
+        </div>
+    </body>
+</html>

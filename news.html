@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="de">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="author" content="Florian Sammüller">
+        <meta name="description" content="Detailliertes Segelflugwetter für Bayern, Thüringen, Sachsen und West-Tschechien mit RASP BLIPMAPS.">
+        <meta name="keywords" content="Aufwinde, aufwinde, RASP, BLIPMAPS, Segelflugwetter, Segelflugwetterbericht, Segelfliegen, DWD, TopMeteo, SkySight, Wettervorhersage, Thermik, Streckenflug, soaring, gliding, weather, forecast">
+        <title>aufwin.de | News</title>
+        <link rel="shortcut icon" type="image/x-icon" href="/favicon.svg">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <nav class="navbar sticky-top navbar-expand-sm navbar-light bg-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/"><img src="/favicon.svg" width="30" height="30" alt=""></a>
+                <div class="nav-item ms-auto me-2 d-grid order-sm-last" id="toForecast">
+                    <a class="btn btn-primary shadow" href="/forecast/">zur Vorhersage</a>
+                </div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/news.html">News</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/impressum.html">Impressum</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/datenschutz.html">Datenschutz</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div role="main" class="container">
+            <h2>News</h2>
+
+            <h4>Verbesserte Berechnung der potentiellen Flugdistanz</h4>
+            <h6>18.06.2021</h6>
+            <p>
+                Die potentielle Flugdistanz (PFD) ist ein Maß für die maximale Strecke, die an einem Tag mit einem Segelflugzeug nach <a href="https://de.wikipedia.org/wiki/Sollfahrttheorie">Sollfahrttheorie</a> zurückgelegt werden kann.<br>
+                Natürlich hängt die PFD von vielen Annahmen ab, allen voran von der Leistung des Segelflugzeugs. Die neu implementierte Berechnung basiert nun auf der Polare eines Schempp-Hirth Discus mit 100kg Ballast. Außerdem fließen neben der Thermikstärke weitere Parameter (Cumulus-Potential, Thermikhöhe, Auftrieb/Scher-Verhältnis,...) mit ein, um eine möglichst realitätsnahe Abschätzung zu gewährleisten. Durch diese Kombination eignet sich die PFD hervorragend für eine erste Einschätzung des Flugtages sowie für die grobe Streckenplanung, bevor die weiteren Parameter eine detailliertere Betrachtung ermöglichen.
+            </p>
+
+            <h4>Update der Vorhersage</h4>
+            <h6>28.04.2021</h6>
+            <p>
+                Die Darstellung der Vorhersagekarten hat jetzt einen neuen Look. Wesentliche Änderungen:
+                <ul>
+                    <li>Zeitnavigation nicht mehr durch Klick auf die Karte, sondern über entsprechend ausgelagerte Schaltflächen</li>
+                    <li><strong>Neustrukturierung des Navigations-Panels</strong> durch Gruppierungen und symbolische Buttons</li>
+                    <li><strong>Interaktive Darstellung der Daten</strong> durch Anzeige der Werte an der aktuellen Mauszeigerposition in Textform über dem Navigations-Panel und als Markierung in der Skala</li>
+                </ul>
+                Außerdem fand ein Update der WRF-Version von 3.6.1 auf 4.2.2 statt.
+            </p>
+
+            <h4>aufwin.de ist online</h4>
+            <h6>18.03.2021</h6>
+            <div class="text-center mb-2">
+                <img src="img/domain_sketch.png" class="rounded img-fluid" style="max-height: 300px;" alt="Karte mit 400km x 400km großem Vorhersagebereich">
+            </div>
+            <p>
+                Seit Mitte März 2021 produziert aufwin.de täglich detaillierte Segelflugwettervorhersagen für den aktuellen sowie den darauffolgenden Tag. Im Moment wird eine 400km x 400km große Region mit Zentrum 50°N 12°E in einer Modellauflösung von 2km abgedeckt, welche Sachsen, Thüringen, einen Großteil Bayerns, Teile der jeweils angrenzenden Bundesländer Baden-Württemberg, Hessen, Sachsen-Anhalt sowie den westlichen Teil Tschechiens einschließt (siehe Bild, inneres Rechteck). Damit beinhaltet der Vorhersagebereich u.a. das Erzgebirge, den Thüringer, Oberpfälzer und Bayerischen Wald sowie Fränkische und Schwäbische Alb, das Thüringer Becken und die Rhön, wodurch diese Seite Wettervorhersagen für viele beliebte Segelflugregionen Deutschlands bietet.<br>
+                Die Vorhersagen basieren auf Modellrechnungen (siehe FAQ), welche täglich gemäß folgendem Zeitplan laufen:
+            </p>
+            <table class="table table-bordered" id="schedule">
+                <thead>
+                    <tr>
+                        <th>Vorhersagetag</th>
+                        <th>Start</th>
+                        <th>Resultate verfügbar ab ca.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Aktueller Tag</td>
+                        <td>0400Z</td>
+                        <td>0530Z</td>
+                    </tr>
+                    <tr>
+                        <td>Folgetag</td>
+                        <td>0600Z</td>
+                        <td>0730Z</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>
+                Vorhersagekarten zu einer Vielzahl von meteorologischen Parametern sowie Vertikalprofile (Temps) und Meteogramme können <a href="/forecast/">in einer interaktiven Karte</a> betrachtet werden. Zu jedem Parameter gibt es Erläuterungen, welche die Interpretation der Resultate erleichtern.<br>
+                Wir freuen uns über Feedback und Unterstützung, um dieses Projekt auch in den nächsten Jahren weiterführen zu können.
+            </p>
+        </div>
+
+        <hr>
+
+        <div class="text-center">
+            <p>© 2022 aufwin.de | <a href="/impressum.html">Impressum</a> | <a href="/datenschutz.html">Datenschutz</a></p>
+        </div>
+    </body>
+</html>
