@@ -63,7 +63,7 @@
          }
         </script>
 
-        <div role="main" class="container">
+        <div role="main" class="container pt-4">
             <h2>FAQ</h2>
             <h4>Was ist RASP?</h4>
             <p>
@@ -72,13 +72,13 @@
             <h4>Wie funktioniert die Segelflugwettervorhersage mit RASP?</h4>
             <p>
                 Mit RASP wird das Wettergeschehen für einen Vorhersagetag nicht etwa nur anhand bereits verfügbarer Modelldaten ausgewertet. Stattdessen führt RASP selbst eine explizite numerische Simulation der physikalischen Bewegungsgleichungen der Atmosphäre durch.<br>
-                Vor dem Start der eigentlichen Simulation werden die aktuellen Wetterdaten vom <a href="https://www.ncdc.noaa.gov/data-access/model-data/model-datasets/global-forcast-system-gfs" target="_blank">Global Forecast System (GFS)</a> bezogen. Mit diesen Daten wird dann ein hochauflösendes Modellgitter auf der zu betrachtenden Region sowie ein gröberes Gitter auf einem größeren umliegenden Bereich initialisiert und die Simulation gestartet. In dieser wird die Zeitentwicklung einer Vielzahl von meteorologischen Parametern auf jedem Gitterpunkt des inneren und äußeren Bereiches berechnet, wofür RASP grundlegende physikalischen Modelle und Gleichungen nutzt, welche die Dynamik dieser Parameter beschreiben.<br>
+                Vor dem Start der eigentlichen Simulation werden die aktuellen Wetterdaten vom <a href="https://www.ncei.noaa.gov/products/weather-climate-models/global-forecast" target="_blank">Global Forecast System (GFS)</a> bezogen. Mit diesen Daten wird dann ein hochauflösendes Modellgitter auf der zu betrachtenden Region sowie ein gröberes Gitter auf einem größeren umliegenden Bereich initialisiert und die Simulation gestartet. In dieser wird die Zeitentwicklung einer Vielzahl von meteorologischen Parametern auf jedem Gitterpunkt des inneren und äußeren Bereiches berechnet, wofür RASP grundlegende physikalischen Modelle und Gleichungen nutzt, welche die Dynamik dieser Parameter beschreiben.<br>
                 Im Laufe der Simulation wird der Rand der äußeren Domäne mit Daten des GFS-Wettermodells gespeist. Die Randbedingungen des inneren Gitters sind wiederum durch das umliegende äußere bestimmt. Durch diese Kopplung ist eine präzise Simulation der hochauflösenden inneren Region möglich, ohne dass sich dabei die Ungenauigkeiten der grob aufgelösten Anfangs- und Randdaten direkt fortpflanzen.<br>
-                In regelmäßigen Zeitabständen werden verschiedene meteorologische Parameter berechnet und ausgegeben. Diese werden nach der Simulation geplottet und auf der Karte dargestellt. Zusätzlich werden für einige Gitterpunkte Vertikalprofile (Temps) und Meteogramme erstellt, die weitere Informationen über den Zustand der unteren Atmosphäre im Tagesverlauf an den jeweiligen Orten geben.
+                In regelmäßigen Zeitabständen werden verschiedene meteorologische Parameter berechnet und ausgegeben. Diese werden nach der Simulation geplottet und auf der Karte dargestellt. Zusätzlich werden für einige Gitterpunkte Meteogramme erstellt, die weitere Informationen über den Zustand der unteren Atmosphäre im Tagesverlauf an den jeweiligen Orten geben. Außerdem können Querschnitte der vertikalen Luftmassenbewegung und Vertikalprofile (Temps) interaktiv erstellt werden.
             </p>
             <h4>Wie genau sind die Resultate?</h4>
             <p>
-                Verglichen mit den meisten anderen bekannten Wettermodellen ist das Gitter, auf dem die physikalischen Bewegungsgleichungen gelöst werden, wesentlich hochauflösender. Außerdem werden zur Modellierung des Geländes Daten der <a href="https://www2.jpl.nasa.gov/srtm/" target="_blank">Shuttle Radar Topography Mission (SRTM)</a> genutzt. Durch diese Maßnahmen:
+                Verglichen mit den meisten anderen bekannten Wettermodellen ist das Gitter, auf dem die physikalischen Bewegungsgleichungen gelöst werden, wesentlich hochauflösender. Außerdem werden zur Modellierung des Geländes Daten der <a href="https://www.earthdata.nasa.gov/data/instruments/srtm" target="_blank">Shuttle Radar Topography Mission (SRTM)</a> genutzt. Durch diese Maßnahmen:
                 <ul>
                     <li>werden die numerischen Fehler der Simulation kleiner.</li>
                     <li>können manche meteorologischen Phänomene explizit berechnet werden, die in Simulationen mit gröberen Gittern nicht zugänglich sind.</li>
@@ -90,7 +90,7 @@
             </p>
             <h4>Gibt es RASP-Vorhersagen auch für andere Regionen?</h4>
             <p>
-                Ja, z.B. <a href="https://blipmaps.nl" target="_blank">blipmaps.nl</a> für BeNeLux und Nordwestdeutschland, <a href="http://46.243.114.203/drjack/nord_de.html" target="_blank">diese Seite</a> für Norddeutschland, <a href="https://www.fcst.pl" target="_blank">fcst.pl</a> für Polen und noch viele weitere außerhalb Mitteleuropas. Lange Zeit hat auch <a href="http://rasp.linta.de" target="_blank">rasp.linta.de</a> Vorhersagen für ganz Deutschland produziert, aber momentan scheint diese Seite inaktiv zu sein.<br>
+                Ja, z.B. <a href="https://blipmaps.nl" target="_blank">blipmaps.nl</a> für BeNeLux und Nordwestdeutschland, <a href="https://thermalmap.info/forecast.php" target="_blank">thermalmap.info</a> mit großer Abdeckung von Europa, <a href="https://fcst.pl" target="_blank">fcst.pl</a> für Polen, sowie noch viele weitere außerhalb Mitteleuropas. Lange Zeit hat auch <a href="http://rasp.linta.de" target="_blank">rasp.linta.de</a> Vorhersagen für ganz Deutschland produziert, aber momentan scheint diese Seite inaktiv zu sein.<br>
                 Die Durchführung eines RASP-Simulationslaufes erfordert einiges an Rechenleistung. Diese gibt es nicht umsonst, was die Auflösung und Größe von Regionen limitiert. Falls Interesse an größeren oder zusätzlichen Regionen, mehr Vorhersagetagen oder häufigeren Simulationsläufen pro Tag besteht, freuen wir uns über <a href="/impressum.html">Unterstützung</a>.
             </p>
         </div>
